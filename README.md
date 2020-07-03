@@ -53,7 +53,7 @@ The `end.` keyword will kill the program, so the main spell must use it as a ter
 
 ### Calling spells
   
-  `#<spell-name>[<args or _>]` will jump to the spell scope and create locally `souls` if `args`is different of `_` (nothing).
+  `#<spell-name>[<args or _>]` will jump to the spell scope and create locally `souls` if `args` is different of `_` (nothing).
 
 ### Spell return
 Use the keyword `awake` to return something. If is an spell, the spell caller will be replaced by the returned value. If is the main spell, the `Dead message` will show the returned value.
@@ -174,7 +174,7 @@ An corpse is an external `.g` file that is loaded inside the main file. (acts li
     spell main[_]:
     
     dead name as 'user'
-    exgume corpuse ;or corpuse.g
+    exhume corpuse ;or corpuse.g
     end.
     
     >>> hello, user!
