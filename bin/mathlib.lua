@@ -57,7 +57,7 @@ function runlib(line)
             local vals = line:match(pat)
             vals = leaf.string_split(vals, ',%s?')
 
-            line = line:gsub(pat, func(table.unpack(vals)))
+            line = line:gsub(pat, func(unpack(vals)))
         end
     end
 

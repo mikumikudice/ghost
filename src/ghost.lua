@@ -38,7 +38,7 @@ local APAU = "Attempt to perform arithmetic with unknown type"
 local ATCD = "Attempt to concatenate name with date"
 local ATRD = "Attempt to remove date from name"
 
-local SKWF = "Strange keyword found here"
+local CNEI = "Could not execute it"
 local USFH = "Unfinished string found here"
 
 local EOFA = "Expected <eof> after this statement"
@@ -669,7 +669,6 @@ function ghst_run(lines)
     end
 
     -- Spells --
-    local s_nm
     local call
     local rtrn
     local sarg = {}
@@ -695,12 +694,19 @@ function ghst_run(lines)
             if rtrn then
 
                 -- Replace value --
-                line = line:gsub('#' .. s_nm .. '%[.+%]', rtrn)
+                local rsub = line:match('#[%w_]+%[[-+%d%._]+%]')
+                or line:match('#[%w_]+%[\'[%w%p]*\'%]')
+                or line:match('#[%w_]+%[[%w%p_]+%]')
+
+                -- Use string sub instead of --
+                -- gsub to avoid missmatches -- 
+                local fdx, ldx = line:find(rsub, 1, true)
+                line = line:sub(1, fdx - 1) .. rtrn .. line:sub(ldx + 1)
 
                 -- Reset params --
                 call = nil
                 rtrn = nil
-                s_nm = nil
+                spll = nil
             end
 
             -- Read values --
@@ -944,7 +950,7 @@ function ghst_run(lines)
                             -- Safe break --
                             if line == before then
                                 
-                                return ghst_err(SKWF, word, elin, clin)
+                                return ghst_err(CNEI, word, elin, clin)
                             end
                         else
 
@@ -954,7 +960,7 @@ function ghst_run(lines)
                             -- Safe break --
                             if line == before then
                                 
-                                return ghst_err(SKWF, word, elin, clin)
+                                return ghst_err(CNEI, word, elin, clin)
                             end
                         end
 
@@ -1017,12 +1023,12 @@ function ghst_run(lines)
                 local truth = line:match('^when (%d)%s?:')
 
                 -- Logic status --
-                stat[c_sc] = truth == '1'
+                stat[c_sc] = truth ~= '0'
 
                 -- Evaluated True --
                 if stat[c_sc] then
                     
-                    line = line:gsub('^when 1%s?:%s?', '')
+                    line = line:gsub('^when [-+]?%d+%s?:%s?', '')
                 
                 -- If not the line --
                 -- will be ignored --
@@ -1050,15 +1056,85 @@ function ghst_run(lines)
 
             -- Empty if/else --
             if line == '' then
-            
+        
+            -- Call spell -- 
+            elseif line:match('#[%w_]+%[([-+%d%._]+)%]')
+                or line:match('#[%w_]+%[(\'[%w%p]*\')%]') then
+    
+                    local spll = line:match('#[%w_]+%[[-+%d%._]+%]')
+                    or line:match('#[%w_]+%[\'[%w%p]*\'%]')
+    
+                    local name = elin:match('#([%w_]+)%[.+%]')
+                    local slin = leaf.table_find(lines, 'spell ' .. name .. '%[.+%]:')
+    
+                    -- Spell not found --
+                    if not spell then
+                        
+                        return ghst_err(ACUS, 1, elin, clin)
+                    
+                    else
+                    
+                        -- Get given args --
+                        local targ = ghst_arg(spll)
+                        sarg = ghst_arg(lines[slin])
+    
+                        if sarg == '' and targ == '' then
+    
+                            -- No arg given, no arg got --
+    
+                        elseif targ ~= '' then
+    
+                            -- Spare arguments --
+                            if sarg == '' then
+                                
+                                return error(SGSA, line:find('%[.+%]:') + 1, elin, clin)
+                            else
+    
+                                for i, n in pairs(sarg) do
+                                    
+                                    -- Assign local entities --
+                                    if not souls[n] then
+                                        
+                                        local a_tp = ghst_ent(targ[i])
+    
+                                        -- Name arg --
+                                        if a_tp == 'name' then
+                                        
+                                            souls[n] = targ[i]:sub(2, -2)
+                                        
+                                        -- Date arg --
+                                        elseif a_tp == 'data' then
+                                        
+                                            souls[n] = targ[i]
+    
+                                        -- Unknow type --
+                                        else
+                                        
+                                            return ghst_err(GIVT, line:find(targ[i]), elin, clin)
+                                        end
+    
+                                    else return ghst_err(ATRE, line:find(n), elin, clin) end
+                                end
+                            end
+    
+                        -- Missing args --
+                        else
+    
+                            return error(MRSA, line:find('%[.+%]:') + 1, elin, clin)
+                        end
+    
+                        call = clin
+                        clin = slin
+                    end
+
             -- End of script / return --
             elseif line == 'end.'
                 or line:match('awake (.*)') then
-                
+
                 local outv = line:match('awake (.*)')
 
                 if outv then
-                    
+
                     -- Spell return --
                     if call then
                         
@@ -1245,6 +1321,7 @@ function ghst_run(lines)
             
                 -- Unknow entity --
                 else return ghst_err(ATWU, elin:find(var), elin, clin) end
+
             -- Output --
             elseif line:match('tell%[(.*)%]') then
 
@@ -1263,72 +1340,6 @@ function ghst_run(lines)
                     io.write(ghst_str(out))
 
                 else io.write(out) end
-            
-            -- Call spell --
-            elseif line:match('#[%w_]+%[(.+)%]') then
-                
-                s_nm = line:match('#([%w_]+)%[.+%]')
-                local s_nm = line:match('#([%w_]+)%[.+%]')
-                local spell = leaf.table_find(lines, 'spell ' .. s_nm .. '%[.+%]:')
-
-                -- Spell not found --
-                if not spell then
-                    
-                    return ghst_err(ACUS, 1, elin, clin)
-                
-                else
-                
-                    -- Get given args --
-                    local targ = ghst_arg(line)
-                    sarg = ghst_arg(lines[spell])
-
-                    if sarg == '' and targ == '' then
-
-                        -- No arg given, no arg got --
-
-                    elseif targ ~= '' then
-
-                        -- Spare arguments --
-                        if sarg == '' then
-                            
-                            return error(SGSA, line:find('%[.+%]:') + 1, elin, clin)
-                        else
-
-                            for i, n in pairs(sarg) do
-                                
-                                -- Assign local entities --
-                                if not souls[n] then
-                                    
-                                    local a_tp = ghst_ent(targ[i])
-
-                                    -- Name arg --
-                                    if a_tp == 'name' then
-                                    
-                                        souls[n] = targ[i]:sub(2, -2)
-                                    
-                                    -- Date arg --
-                                    elseif a_tp == 'data' then
-                                    
-                                        souls[n] = targ[i]
-
-                                    -- Unknow type --
-                                    else
-                                    
-                                        return ghst_err(GIVT, line:find(targ[i]), elin, clin)
-                                    end
-                                else return ghst_err(ATRE, line:find(n), elin, clin) end
-                            end
-                        end
-
-                    -- Missing args --
-                    else
-
-                        return error(MRSA, line:find('%[.+%]:') + 1, elin, clin)
-                    end
-
-                    call = clin
-                    clin = spell
-                end
 
             -- Jump line --
             elseif line:match('remember .*') then
@@ -1388,7 +1399,7 @@ function ghst_run(lines)
             -- Strange line --
             else
                 
-                return ghst_err(SKWF, 1, elin, clin)
+                return ghst_err(CNEI, 1, elin, clin)
             end
         end
 

@@ -10,9 +10,9 @@ spell necro[_]:
 
     !indx as ?indx pls 1
 
-    when ?indx sme @list.len : remember 7
+    when ?indx sle @list.len : remember 7
 
-    !list.@list.len pls 1 as 'pinaple'
+    !list.@list.len pls 1 as 'pineapple'
 
     dead pidx as @list.len
     
