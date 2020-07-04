@@ -122,7 +122,7 @@ To read an entity value, use the `?` operator. To write at the entity slot, use 
   * `dif` : same of `~=` or `!=`
   
   * `grt` : same of `>`
-  * `gre` : same of `>=`
+  * `gte` : same of `>=`
   
   * `sml` : same of `<`
   * `sle` : same of `<=`
