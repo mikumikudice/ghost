@@ -2,7 +2,6 @@ require 'leaf'
 
 local fname
 local entry
-local spell = {}
 local souls = {}
 local deads = {}
 local graveyard = {}
@@ -288,7 +287,7 @@ local oper = {
         end
     },
 
-    [10] = { -- gre --
+    [10] = { -- gte --
 
         date = function(lft, rgt)
 
@@ -399,7 +398,7 @@ local o_nm = {
     [07] = 'dif',
     [08] = 'grt',
     [09] = 'sml',
-    [10] = 'gre',
+    [10] = 'gte',
     [11] = 'sle',
     [12] = 'and',
     [13] = 'or' ,
@@ -458,6 +457,7 @@ function load_file(name, subf)
         name = name .. '.g'
     end
 
+    -- Return name --
     fname = name:sub(1, -3):upper()
     
     -- Get only file name --
@@ -466,6 +466,8 @@ function load_file(name, subf)
         fname = fname:sub(math.max(fname:find('/')) + 1)
     end
 
+    -- Only show running message --
+    -- when loading the main file --
     if not subf then
     
         local msg = '\nrunning ' .. fname:lower() .. '...'
@@ -474,6 +476,7 @@ function load_file(name, subf)
         print(string.rep('=', #msg - 1))
     end
 
+    -- If file exists --
     if io.open(name) then
 
         local l_num = 1
@@ -652,7 +655,8 @@ function ghst_run(lines)
         -- Not found --
         if not main then
 
-            return ghst_err('at line ' .. (clin) .. ': ' .. entry .. ' spell not found (entry)')
+            return ghst_err('at line ' .. (clin) .. ': '
+            .. entry .. ' spell not found (entry)')
         
         else
 
@@ -733,6 +737,7 @@ function ghst_run(lines)
 
                         return ghst_err(ATRU, line:find(var, 1, true), elin, clin)
                     end
+
                 else break end
             end
 
@@ -784,7 +789,7 @@ function ghst_run(lines)
             end
 
             -- Input --
-            if line:match('read%[(.+)%]') then
+            while line:match('read%[(.+)%]') do
 
                 local arg = line:match('read%[(\'[%w%p_]*\')%]')
                 or line:match('read%[([-+]?%d+%.?%d*)%]')
@@ -880,7 +885,7 @@ function ghst_run(lines)
 
                     else
 
-                        -- Find null match
+                        -- Get the null match --
                         local lt, rt
                         lt = line:match('([-+]?%d+%.?%d*)' .. sub)
                         or line:match('(\'[%w%p]*\')' .. sub)
@@ -982,8 +987,6 @@ function ghst_run(lines)
                 end
             end
 
-        --# Running ---------------------------------------#--
-
             -- also : ... --
             while line:match('^also%s?:') do
 
@@ -1054,82 +1057,84 @@ function ghst_run(lines)
                 else break end
             end
 
-            -- Empty if/else --
-            if line == '' then
+        --# Running ---------------------------------------#--
         
             -- Call spell -- 
-            elseif line:match('#[%w_]+%[([-+%d%._]+)%]')
-                or line:match('#[%w_]+%[(\'[%w%p]*\')%]') then
+            if line:match('#[%w_]+%[([-+%d%._]+)%]')
+            or line:match('#[%w_]+%[(\'[%w%p]*\')%]') then
     
-                    local spll = line:match('#[%w_]+%[[-+%d%._]+%]')
-                    or line:match('#[%w_]+%[\'[%w%p]*\'%]')
-    
-                    local name = elin:match('#([%w_]+)%[.+%]')
-                    local slin = leaf.table_find(lines, 'spell ' .. name .. '%[.+%]:')
-    
-                    -- Spell not found --
-                    if not spell then
-                        
-                        return ghst_err(ACUS, 1, elin, clin)
+                local spll = line:match('#[%w_]+%[[-+%d%._]+%]')
+                or line:match('#[%w_]+%[\'[%w%p]*\'%]')
+
+                local name = elin:match('#([%w_]+)%[.+%]')
+                local slin = leaf.table_find(lines, 'spell ' .. name .. '%[.+%]:')
+
+                -- Spell not found --
+                if not spell then
                     
-                    else
-                    
-                        -- Get given args --
-                        local targ = ghst_arg(spll)
-                        sarg = ghst_arg(lines[slin])
-    
-                        if sarg == '' and targ == '' then
-    
-                            -- No arg given, no arg got --
-    
-                        elseif targ ~= '' then
-    
-                            -- Spare arguments --
-                            if sarg == '' then
-                                
-                                return error(SGSA, line:find('%[.+%]:') + 1, elin, clin)
-                            else
-    
-                                for i, n in pairs(sarg) do
-                                    
-                                    -- Assign local entities --
-                                    if not souls[n] then
-                                        
-                                        local a_tp = ghst_ent(targ[i])
-    
-                                        -- Name arg --
-                                        if a_tp == 'name' then
-                                        
-                                            souls[n] = targ[i]:sub(2, -2)
-                                        
-                                        -- Date arg --
-                                        elseif a_tp == 'data' then
-                                        
-                                            souls[n] = targ[i]
-    
-                                        -- Unknow type --
-                                        else
-                                        
-                                            return ghst_err(GIVT, line:find(targ[i]), elin, clin)
-                                        end
-    
-                                    else return ghst_err(ATRE, line:find(n), elin, clin) end
-                                end
-                            end
-    
-                        -- Missing args --
+                    return ghst_err(ACUS, 1, elin, clin)
+                
+                else
+                
+                    -- Get given args --
+                    local targ = ghst_arg(spll)
+                    sarg = ghst_arg(lines[slin])
+
+                    if sarg == '' and targ == '' then
+
+                        -- No arg given, no arg got --
+
+                    elseif targ ~= '' then
+
+                        -- Spare arguments --
+                        if sarg == '' then
+                            
+                            return error(SGSA, line:find('%[.+%]:') + 1, elin, clin)
                         else
-    
-                            return error(MRSA, line:find('%[.+%]:') + 1, elin, clin)
+
+                            for i, n in pairs(sarg) do
+                                
+                                -- Assign local entities --
+                                if not souls[n] then
+                                    
+                                    local a_tp = ghst_ent(targ[i])
+
+                                    -- Name arg --
+                                    if a_tp == 'name' then
+                                    
+                                        souls[n] = targ[i]:sub(2, -2)
+                                    
+                                    -- Date arg --
+                                    elseif a_tp == 'data' then
+                                    
+                                        souls[n] = targ[i]
+
+                                    -- Unknow type --
+                                    else
+                                    
+                                        return ghst_err(GIVT, line:find(targ[i]), elin, clin)
+                                    end
+
+                                else return ghst_err(ATRE, line:find(n), elin, clin) end
+                            end
                         end
-    
-                        call = clin
-                        clin = slin
+
+                    -- Missing args --
+                    else
+
+                        return error(MRSA, line:find('%[.+%]:') + 1, elin, clin)
                     end
 
+                    call = clin
+                    clin = slin
+                end
+
+                line = ''
+            end
+
             -- End of script / return --
-            elseif line == 'end.'
-                or line:match('awake (.*)') then
+            if line == 'end.'
+            or line:match('awake (.*)') then
 
                 local outv = line:match('awake (.*)')
 
@@ -1160,8 +1165,55 @@ function ghst_run(lines)
                     .. (outv or 'NONE')
                 end
 
+                line = ''
+            end
+
+            -- Load external component --
+            if line:match('exhume ([%w_]+)')
+            or line:match('exhume ([%w_]+%.g)') then
+
+                local o_name = fname
+                local corpse = line:match('exhume ([%w_]+)')
+                local subrun = load_file(corpse, true)
+
+                -- Returned lines --
+                if type(subrun) == 'table' then
+                
+                    -- Print output of code --
+                    local out = ghst_run(subrun)
+                    fname = o_name
+
+                    -- Returned error --
+                    if not out:find('died successfully') then
+                        
+                        return out
+                    end
+
+                -- Print error messsage --
+                else return subrun end
+
+                line = ''
+            end
+
+            -- Load internel lib --
+            if line:match('invoke ([%w_]+)') then
+
+                local lib = line:match('invoke ([%w_]+)')
+
+                if io.open(lib .. '.lua') then
+                
+                    table.insert(i_lib, require(lib))
+                
+                else
+                    
+                    return ghst_err('Lib "' .. lib .. '" not found', elin:find(lib), elin, clin)
+                end
+
+                line = ''
+            end
+
             -- End of spell --
-            elseif line == 'end' then
+            if line == 'end' then
 
                 -- Return to call line --
                 if call then
@@ -1180,13 +1232,11 @@ function ghst_run(lines)
                 
                 else return ghst_err(WMSE, 1, elin, clin) end
 
-            -- Place holders --
-            elseif line:match('^when .*%s?:%s?') then
-            elseif line:match('^also%s?:%s?') then
-            elseif line:match('^else%s?:%s?') then
+                line = ''
+            end
 
             -- Instantiate a soul -- 
-            elseif line:match('soul ([%w_]+) as (.+)') then
+            if line:match('soul ([%w_]+) as (.+)') then
 
                 local var, val = line:match('soul ([%w%d_]+) as (.+)')
 
@@ -1213,8 +1263,11 @@ function ghst_run(lines)
 
                 else return ghst_err(ATRE, line:find(var, 1, true), elin, clin) end
 
+                line = ''
+            end
+
             -- Instantiate a dead --
-            elseif line:match('dead ([%w_]+) as (.+)') then
+            if line:match('dead ([%w_]+) as (.+)') then
 
                 local var, val = line:match('dead ([%w%d_]+) as (.+)')
 
@@ -1241,8 +1294,11 @@ function ghst_run(lines)
 
                 else return ghst_err(ATRE, line:find(var, 1, true), elin, clin) end
 
+                line = ''
+            end
+
             -- Graveyards --
-            elseif line:match('graveyard ([%w_]+) as %((.+,?)%)') then
+            if line:match('graveyard ([%w_]+) as %((.+,?)%)') then
 
                 local grvy, vals = line:match('graveyard ([%w_]+) as %((.+,?)%)')
                 
@@ -1284,8 +1340,11 @@ function ghst_run(lines)
 
                 else return ghst_err(ATRE, line:find(grvy, 1, true), elin, clin) end
 
+                line = ''
+            end
+
             -- Assign an value --
-            elseif line:match('%!([%w_]+) as (.*)') then
+            if line:match('%!([%w_]+) as (.*)') then
 
                 local var, val = line:match('%!([%w%d_]+) as (.*)')
 
@@ -1304,9 +1363,12 @@ function ghst_run(lines)
             
                 -- Unknow entity --
                 else return ghst_err(ATWU, elin:find(var), elin, clin) end
-            
+
+                line = ''
+            end
+
             -- Assign a value to a graveyard --
-            elseif line:match('%!([%w_]+)%.(%d+) as (.*)') then
+            if line:match('%!([%w_]+)%.(%d+) as (.*)') then
 
                 local var, idx, val = line:match('%!([%w%d_]+)%.(%d+) as (.*)')
 
@@ -1321,9 +1383,12 @@ function ghst_run(lines)
             
                 -- Unknow entity --
                 else return ghst_err(ATWU, elin:find(var), elin, clin) end
+            
+                line = ''
+            end
 
             -- Output --
-            elseif line:match('tell%[(.*)%]') then
+            if line:match('tell%[(.*)%]') then
 
                 local out = line:match('tell%[(\'[%w%p_]*\')%]')
                 or line:match('tell%[([-+]?%d+%.?%d*)%]')
@@ -1341,8 +1406,11 @@ function ghst_run(lines)
 
                 else io.write(out) end
 
+                line = ''
+            end
+
             -- Jump line --
-            elseif line:match('remember .*') then
+            if line:match('remember .*') then
 
                 -- Line index --
                 local word = line:match('remember (.*)')
@@ -1362,42 +1430,11 @@ function ghst_run(lines)
                     return ghst_err(ATJN, line:find(word), elin, clin)
                 end
 
-            -- Load external component --
-            elseif line:match('exhume ([%w_]+)')
-                or line:match('exhume ([%w_]+%.g)') then
-
-                local o_name = fname
-                local corpse = line:match('exhume ([%w_]+)')
-                local subrun = load_file(corpse, true)
-
-                -- Returned lines --
-                if type(subrun) == 'table' then
-                
-                    -- Print output of code --
-                    local out = ghst_run(subrun)
-                    fname = o_name
-
-                    -- Returned error --
-                    if not out:find('died successfully') then
-                        
-                        return out
-                    end
-
-                -- Print error messsage --
-                else return subrun end
-
-            -- Load internel lib --
-            elseif line:match('invoke ([%w_]+)') then
-
-                local lib = line:match('invoke ([%w_]+)')
-
-                if io.open(lib .. '.lua') then
-                
-                    table.insert(i_lib, require(lib))
-                end
+                line = ''
+            end
 
             -- Strange line --
-            else
+            if line ~= '' then
                 
                 return ghst_err(CNEI, 1, elin, clin)
             end
@@ -1427,7 +1464,7 @@ if arg[1] and arg[1] ~= '' then
 -- Open file --
 else
     
-    hello = 'GHOST 1.0 - Using leaf core | by Mateus M. Dias'
+    hello = 'GHOST 1.0.2 - Using leaf core | by Mateus M. Dias'
 
     print(hello)
     print(string.rep('=', #hello) .. '\n')
