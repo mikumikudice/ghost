@@ -109,28 +109,28 @@ To read an entity value, use the `?` operator. To write at the entity slot, use 
     
 ## Operators
 
-  * `mul` : same of `*`
-  * `pow` : same of `^` or `**`
+  `mul` : same of `*`<br/>
+  `pow` : same of `^` or `**`
   
-  * `div` : same of `/`
-  * `mod` : same of `%`
+  `div` : same of `/`<br/>
+  `mod` : same of `%`
   
-  * `sum` : same of `+`
-  * `min` : same of `-`
+  `sum` : same of `+`<br/>
+  `min` : same of `-`
   
-  * `eql` : same of `==`
-  * `dif` : same of `~=` or `!=`
+  `eql` : same of `==`<br/>
+  `dif` : same of `~=` or `!=`
   
-  * `grt` : same of `>`
-  * `gte` : same of `>=`
+  `grt` : same of `>`<br/>
+  `gte` : same of `>=`
   
-  * `sml` : same of `<`
-  * `sle` : same of `<=`
+  `sml` : same of `<`<br/>
+  `sle` : same of `<=`
   
-  * `and` : same of `&&`
-  * `or`  : same of `||`
+  `and` : same of `&&`<br/>
+  `or`  : same of `||`
   
-  * `not` : same of `!` or `not`
+  `not` : same of `!` or `not`
   
 ### Bolean Logic
 Anything that is greater (or diferent) than 0 is true. Empty names (`''`) and `0` are false.
@@ -160,7 +160,7 @@ A growable array of the same or different value types.
     >>> pineapple
 
 ### Corpses
-An corpse is an external `.g` file that is loaded inside the main file. (acts line `dofile` of Lua).
+An corpse is an external `.g` file that is loaded inside the main file. (acts like the `dofile` in Lua).
     
     ;corpuse.g
     necro as entry
