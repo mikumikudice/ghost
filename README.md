@@ -1,5 +1,5 @@
 # ghost
-A scripting language to summon spells and kill programs.<br/>
+A scripting esolang to summon spells and kill programs.<br/>
 Inspired by the languages ZOMBIE and Pascal.
 
 ## Hello world in ghost
@@ -10,7 +10,7 @@ Inspired by the languages ZOMBIE and Pascal.
     tell['Hello world!']
     end.
     
-Current version: 1.0.1
+Current version: 1.0.2
 
 ## Introduction
 Ghost is an interpreter forged to kill programs. To kill them, it must make the code fulfill its purpose so that it can die in peace.
