@@ -1,8 +1,0 @@
-## 1.0.2
-- Unused table "spell"
-* Greater or equal operator (gre -> gte)
-* CNEI error catcher
-+ File Not Found error to `invoke` spell
-
-## 1.0.1
-- Spell return bug
