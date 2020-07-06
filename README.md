@@ -29,9 +29,8 @@ Ghost is an interpreter forged to kill programs. To kill them, it must make the 
     a simple program.
     
 ## Usage
-* Linux<br/>
-  ``./ghost file.g`` to run directly the code.<br/>
-  ``./ghost`` to show a hello entry.
+``./ghost file.g`` to run directly the code.<br/>
+``./ghost`` to show a hello entry.
 
 ## Code Syntax
 Every script must start with a entry indication.
