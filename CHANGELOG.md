@@ -1,3 +1,6 @@
+## 1.0.3
+\* Fixed quote escape char (`\q` -> `\'`)
+
 ## 1.0.2
 \- Unused table "spell"<br/>
 \* Greater or equal operator (gre -> gte)<br/>
