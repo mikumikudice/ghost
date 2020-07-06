@@ -808,7 +808,7 @@ function ghst_run(lines)
                 
                 -- Fix scape chars --
                 _in:gsub(' ', '\\s')
-                _in:gsub('\'', '\\q')
+                _in:gsub('\'', '\\\'')
 
                 line = line:gsub('read%['.. arg .. '%]', '\'' .. _in .. '\'')
             end
@@ -1464,7 +1464,7 @@ if arg[1] and arg[1] ~= '' then
 -- Open file --
 else
     
-    hello = 'GHOST 1.0.2 - Using leaf core | by Mateus M. Dias'
+    hello = 'GHOST 1.0.3 - Using leaf core | by Mateus M. Dias'
 
     print(hello)
     print(string.rep('=', #hello) .. '\n')
