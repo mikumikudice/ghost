@@ -10,7 +10,7 @@ Inspired by the languages ZOMBIE and Pascal.
     tell['Hello world!']
     end.
     
-Current version: 1.0.2
+Current version: 1.0.3
 
 ## Introduction
 Ghost is an interpreter forged to kill programs. To kill them, it must make the code fulfill its purpose so that it can die in peace.
@@ -140,7 +140,24 @@ Lines that are executed when something evaluates to true or false.
   * `when <val> : ;something` executed when `val`is true.
   * `else : ;something` executed when the logic line above is not executed.
   * `also : ;something` executet then the logic line is executed.
-  
+
+## Jump line
+`remember <date>` jumps to line `date`. Useful for loops. e.g.
+
+    1  soul num as 0
+    2
+    3  tell[?num]
+    4  tell['\n']
+    5
+    6  !num as ?num pls 1
+    7
+    8  when ?num sme 3 : rebember 3
+    
+    >>> 0
+    >>> 1
+    >>> 2
+    >>> 3
+
 ### Graveyards
 A growable array of the same or different value types.
 
