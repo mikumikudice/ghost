@@ -32,7 +32,7 @@ Ghost is an interpreter forged to kill programs. To kill them, it must make the 
 ``./ghost file.g`` to run directly the code.<br/>
 ``./ghost`` to show a hello entry.
 
-\* Windows binary still have unsolved problems.
+\* Windows binary still have unsolved problems.<br/>
     - Math module doesn't work (`attempt to call global "unpack" (a nil value).`)
     
 The current binary file for windows uses srlua instead of luastatic (linux binary), if you can compile the source file for windows using luastatic it would be of great help.
