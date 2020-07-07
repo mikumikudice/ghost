@@ -1,0 +1,16 @@
+## 1.1.2
+- lines working inside false when block
+- grt, sml, gre, sle bug
+- Spell args bug
+* File extention (`.g` -> `.gh`)
+* Better compiling
++ Operations inside parentheses
+
+## 1.0.2
+- Unused table "spell"
+* Greater or equal operator (gre -> gte)
+* CNEI error catcher
++ File Not Found error to `invoke` spell
+
+## 1.0.1
+- Spell return bug

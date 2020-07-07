@@ -1,0 +1,22 @@
+main as entry
+spell main[_]:
+
+    dead max as read['until: ']
+
+    graveyard trm as (0, 1)
+    soul num as 2
+
+    !trm.(@trm.len pls 1) as @trm.?num pls @trm.(?num min 1)
+    !num as ?num pls 1
+
+    when @trm.@trm.len sml ?max : remember 9
+
+    soul i as 1
+
+    tell[@trm.?i]
+
+    !i as ?i pls 1
+
+    when ?i sle @trm.len : tell['\n']
+    also : remember 16
+end.
