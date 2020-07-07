@@ -1,5 +1,5 @@
 ## 1.1.2
-- lines working inside false when block
+- lines working inside false logic block
 - grt, sml, gre, sle bug
 - Spell args bug
 * File extention (`.g` -> `.gh`)
