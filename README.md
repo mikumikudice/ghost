@@ -10,7 +10,7 @@ Inspired by the languages ZOMBIE and Pascal.
     tell['Hello world!']
     end.
     
-Current version: 1.0.3
+Current version: 1.1.2
 
 ## Introduction
 Ghost is an interpreter forged to kill programs. To kill them, it must make the code fulfill its purpose so that it can die in peace.
