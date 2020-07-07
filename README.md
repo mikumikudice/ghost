@@ -29,7 +29,7 @@ Ghost is an interpreter forged to kill programs. To kill them, it must make the 
     a simple program.
     
 ## Usage
-``./ghost file.g`` to run directly the code.<br/>
+``./ghost file.gh`` to run directly the code.<br/>
 ``./ghost`` to show a hello entry.
 
 \* Windows binary still have unsolved problems.<br/>
@@ -183,14 +183,14 @@ A growable array of the same or different value types.
 ### Corpses
 An corpse is an external `.g` file that is loaded inside the main file. (acts like the `dofile` in Lua).
     
-    ;corpuse.g
+    ;corpuse.gh
     necro as entry
     spell necro[_]:
     
     tell['hello, ' pls ?name pls '!']
     end.
 
-    ;main.g
+    ;main.gh
     main as entry
     spell main[_]:
     
