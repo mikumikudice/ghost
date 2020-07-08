@@ -1,3 +1,6 @@
+## 1.1.4
+\- 1.1.3 when block bug ('\[-+]%d+%.%d*' -> '\[-+]%d+%.?%d*')
+
 ## 1.1.3
 \- Exhume function bug (wrong extension)<br/>
 \* Better compiling<br/>
