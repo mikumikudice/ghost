@@ -10,7 +10,7 @@ Inspired by the languages ZOMBIE and Pascal.
     tell['Hello world!']
     end.
     
-Current version: 1.1.2
+Current version: 1.1.3
 
 ## Introduction
 Ghost is an interpreter forged to kill programs. To kill them, it must make the code fulfill its purpose so that it can die in peace.
@@ -29,13 +29,10 @@ Ghost is an interpreter forged to kill programs. To kill them, it must make the 
     a simple program.
     
 ## Usage
+Program compiled using [[luastatic](https://github.com/ers35/luastatic)].
+
 ``./ghost file.gh`` to run directly the code.<br/>
 ``./ghost`` to show a hello entry.
-
-\* Windows binary still have unsolved problems.<br/>
-    - Math module doesn't work (`attempt to call global "unpack" (a nil value).`)
-    
-The current binary file for windows uses srlua instead of luastatic (linux binary), if you can compile the source file for windows using luastatic it would be of great help.
 
 ## Code Syntax
 Every script must start with a entry indication.
