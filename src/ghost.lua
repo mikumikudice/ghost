@@ -247,9 +247,10 @@ local oper = {
 
         date = function(lft, rgt)
 
+            lft = tonumber(lft)
+
             if tonumber(rgt) then
 
-                lft = tonumber(lft) 
                 rgt = tonumber(rgt)
 
                 if lft > rgt then return 1
@@ -273,16 +274,17 @@ local oper = {
 
         date = function(lft, rgt)
 
+            lft = tonumber(lft)
+
             if tonumber(rgt) then
 
-                lft = tonumber(lft) 
                 rgt = tonumber(rgt)
 
                 if lft < rgt then return 1
                 else return 0 end
             
             else
-                
+
                 if lft < #rgt then return 1
                 else return 0 end
             end
@@ -299,9 +301,10 @@ local oper = {
 
         date = function(lft, rgt)
 
+            lft = tonumber(lft)
+
             if tonumber(rgt) then
 
-                lft = tonumber(lft) 
                 rgt = tonumber(rgt)
 
                 if lft >= rgt then return 1
@@ -325,9 +328,10 @@ local oper = {
 
         date = function(lft, rgt)
 
+            lft = tonumber(lft)
+
             if tonumber(rgt) then
 
-                lft = tonumber(lft) 
                 rgt = tonumber(rgt)
 
                 if lft <= rgt then return 1
@@ -1243,7 +1247,7 @@ function ghst_run(lines)
                 c_sc = c_sc + 1
 
                 -- String to bool --
-                if line:match('when%s?(\'[%w%p]*\')%s?:') then
+                if line:match('when (\'[%w%p]*\')%s?:') then
 
                     local val = line:match('%s?(\'[%w%p]*\')%s?')
                     local key = val
@@ -1254,7 +1258,7 @@ function ghst_run(lines)
                     line = line:gsub(key, val)
                 end
 
-                local truth = line:match('^when ([-+]?%d+%.%d*)%s?:')
+                local truth = line:match('^when ([-+]?%d+%.?%d*)%s?:')
 
                 -- Logic status --
                 stat[c_sc] = truth ~= '0'
@@ -1262,7 +1266,7 @@ function ghst_run(lines)
                 -- Evaluated True --
                 if stat[c_sc] then
                     
-                    line = line:gsub('^when [-+]?%d+%.%d*%s?:%s?', '')
+                    line = line:gsub('^when [-+]?%d+%.?%d*%s?:%s?', '')
                 
                 -- If not the line --
                 -- will be ignored --
@@ -1718,7 +1722,7 @@ if arg[1] and arg[1] ~= '' then
 -- Open file --
 else
     
-    hello = 'GHOST 1.1.3 - Using leaf core | by Mateus M. Dias'
+    hello = 'GHOST 1.1.4 - Using leaf core | by Mateus M. Dias'
 
     print(hello)
     print(string.rep('=', #hello) .. '\n')
