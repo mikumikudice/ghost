@@ -1,5 +1,6 @@
 ## 1.1.4
-\- 1.1.3 when block bug ('\[-+]%d+%.%d*' -> '\[-+]%d+%.?%d*')
+\- 1.1.3 when block bug ('\[-+]%d+%.%d*' -> '\[-+]%d+%.?%d*')<br/>
+\- rt, sml, gre, sle bug (attempt to compare string with number)
 
 ## 1.1.3
 \- Exhume function bug (wrong extension)<br/>
