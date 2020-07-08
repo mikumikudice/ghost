@@ -19,6 +19,7 @@ local ATJI = "Attempt to jump to an line out of range"
 
 local ACUS = "Attempt to call an undefined spell"
 local WMSE = "Wrong main spell ender (correct: \"end.\")"
+local MPKK = "Missing program killer keyword (\"end.\")"
 local SGSA = "Spell got spare arguments"
 local MRSA = "Missing required spell arguments"
 
@@ -42,6 +43,7 @@ local USFH = "Unfinished string found here"
 
 local EOFA = "Expected <eof> after this statement"
 local EOFB = "Expected <eof> before this statement"
+local EOFN = "Expected <eof> near \"end\""
 
 -- Operators --
 local oper = {
@@ -518,12 +520,23 @@ function load_file(name, subf)
             -- Replace spaces inside strings --
             -- to avoid missmatches at lines --
 
-            local fidx
+            local fidx, indx
             local pair = {}
             for i = 1, #line do
 
                 local c = line:sub(i, i)
                 local l = line:sub(i - 1, i - 1)
+
+                -- Comments --
+                if c == ';' then
+                
+                    -- In't inside an string --
+                    -- and is the first ocur --
+                    if not fidx and not indx then
+
+                        indx = i
+                    end
+                end
 
                 if c == "'" and l ~= "\\" then
                     
@@ -551,8 +564,6 @@ function load_file(name, subf)
                 line = line:gsub(sub, new)
             end
 
-            -- Comments --
-            local indx = line:find(';')
             if indx then
                 
                 line = line:sub(1, indx - 1)
@@ -569,40 +580,62 @@ function load_file(name, subf)
 
         -- File content --
         local cntt = ''
-        for _, lin in pairs(lines) do
+        for l = 1, l_num do
             
-            cntt = cntt .. lin .. '\n'
+            if lines[l] then
+
+                cntt = cntt .. lines[l] .. '\n'
+            end
         end
 
         -- <eof> error catcher --
 
-        local entr = "spell [%w_]+%[.+%]:.+end%."
-        local spll = "spell [%w_]+%[.+%]:.+end"
+        local entr = "spell [%w_]+%[[%w_]+%]:.+end%."
+        local spll = "spell [%w_]+%[[%w_]+%]:"
 
-        local _, scnt = cntt:gsub('spell [%w_]+', '')
+        local _, scnt = cntt:gsub('spell [%w_]+%[[%w_]+%]:', '')
 
+        -- More than one spell --
         if scnt > 1 then
+
+            -- Missing program killer --
+            if not cntt:find('end.', 1, true) then
+
+                local lin = leaf.table_last(lines)
+                return ghst_err(MPKK, 1, lines[lin], lin)
             
-            local main = cntt:match(entr)
+            else cntt = cntt:gsub(entr, '') end
 
-            -- Remove main spell --
-            if main then
+            local splls = {}
+
+            -- Get all spells --
+            for spl in cntt:gmatch(spll) do
                 
-                _, main = cntt:find(main, 1, true)
-                cntt = cntt:sub(main + 2)
+                table.insert(splls, spl)
+            end
 
-            else return ghst_err('No entry spell detected') end
+            -- Check if all is closed --
+            local _, ecnt = cntt:gsub('end', '')
 
-            -- Closed scopes count --
-            local _, sc_c = cntt:gsub(spll, '')
+            -- More spells than ends --
+            if ecnt < scnt - 1 then
 
-            -- There is more spells than ends --
-            if not (scnt - 1 == sc_c) then
+                local spl = splls[#splls]
+                return ghst_err(EOFB, 1, spl, leaf.table_find(lines, spl, true))
 
-                local ssub = cntt:sub(1, math.min(cntt:find(':', 1, true)))
-                local line = cntt:sub(cntt:find(ssub, 1, true))
+            -- More ends than spells --
+            elseif ecnt > scnt - 1 then
 
-                return ghst_err(EOFA, 1, line, leaf.table_find(lines, line, true))
+                local lin = leaf.table_find(lines, splls[#splls], true)
+
+                -- Find "end" before this spell --
+                for l = lin - 1, 1, -1 do
+                    
+                    if lines[l] then
+                    
+                        return ghst_err(EOFN, 1, lines[l], l)
+                    end
+                end
             end
         end
 
@@ -1149,9 +1182,9 @@ function ghst_run(lines)
                     line = line:gsub(opr .. ' 0', ' 1')
                 end
 
-                if line:match(opr .. ' [-+]?%d+') then
+                if line:match(opr .. ' [-+]?%d+%.?%d*') then
                     
-                    line = line:gsub(opr .. ' [-+]?%d+', ' 0')
+                    line = line:gsub(opr .. ' [-+]?%d+%.?%d*', ' 0')
                 end
             end
 
@@ -1221,7 +1254,7 @@ function ghst_run(lines)
                     line = line:gsub(key, val)
                 end
 
-                local truth = line:match('^when (%d)%s?:')
+                local truth = line:match('^when ([-+]?%d+%.%d*)%s?:')
 
                 -- Logic status --
                 stat[c_sc] = truth ~= '0'
@@ -1229,7 +1262,7 @@ function ghst_run(lines)
                 -- Evaluated True --
                 if stat[c_sc] then
                     
-                    line = line:gsub('^when [-+]?%d+%s?:%s?', '')
+                    line = line:gsub('^when [-+]?%d+%.%d*%s?:%s?', '')
                 
                 -- If not the line --
                 -- will be ignored --
@@ -1258,7 +1291,7 @@ function ghst_run(lines)
         --# Running ---------------------------------------#--
         
             -- Call spell -- 
-            if line:match('#[%w_]+%[([-+%d%._]+)%]')
+            if line:match('#[%w_]+%[([-+]?%d+%.%d*)%]')
             or line:match('#[%w_]+%[(\'[%w%p]*\')%]') then
     
                 local spll = line:match('#[%w_]+%[[-+%d%._]+%]')
@@ -1368,7 +1401,7 @@ function ghst_run(lines)
 
             -- Load external component --
             if line:match('^exhume ([%w_]+)')
-            or line:match('^exhume ([%w_]+%.g)') then
+            or line:match('^exhume ([%w_]+%.gh)') then
 
                 local o_name = fname
                 local corpse = line:match('exhume ([%w_]+)')
@@ -1685,7 +1718,7 @@ if arg[1] and arg[1] ~= '' then
 -- Open file --
 else
     
-    hello = 'GHOST 1.1.2 - Using leaf core | by Mateus M. Dias'
+    hello = 'GHOST 1.1.3 - Using leaf core | by Mateus M. Dias'
 
     print(hello)
     print(string.rep('=', #hello) .. '\n')
