@@ -4,11 +4,13 @@ Inspired by the languages ZOMBIE and Pascal.
 
 ## Hello world in ghost
 
-    main as entry
-    spell main[_]:
-    
-    tell['Hello world!']
-    end.
+```assembly
+main as entry
+spell main[_]:
+
+tell['Hello world!']
+end.
+```
     
 Current version: 1.1.3
 
@@ -36,20 +38,21 @@ Program compiled using [[luastatic](https://github.com/ers35/luastatic)].
 
 ## Code Syntax
 Every script must start with a entry indication.
-
-    <main-spell-name> as entry
-
+```assembly
+<main-spell-name> as entry
+```
 ### Comments
 Anything after an `;` will disappear.
 
 ### Spells
 Callable scopes in Ghost. The main spell will be called at the start of the program.
 
-    spell <spell-name> [<args or _>]:
-    
-    ;your code
-    end
-    
+```assembly
+spell <spell-name> [<args or _>]:
+
+;your code
+end
+```    
 The `end.` keyword will kill the program, so the main spell must use it as a termination. All other spells must end with `end`.
 
 ### Calling spells
@@ -59,18 +62,20 @@ The `end.` keyword will kill the program, so the main spell must use it as a ter
 ### Spell return
 Use the keyword `awake` to return something. If is an spell, the spell caller will be replaced by the returned value. If is the main spell, the `Dead message` will show the returned value.
 
-    main as entry
-    spell main[_]:
-    
-    tell[#hello['user']]
-    end.
-    
-    spell hello[name]:
-      
-    awake 'Hello, ' pls ?name pls '!'
-    end
-    
-    >>> Hello, user!
+```assembly
+main as entry
+spell main[_]:
+
+tell[#hello['user']]
+end.
+
+spell hello[name]:
+
+awake 'Hello, ' pls ?name pls '!'
+end
+
+>>> Hello, user!
+```
 
 ### I/O
 Read and write values from or to user.
@@ -96,6 +101,7 @@ In a grave, there are only two types of information: names and dates.
 ## Read and write
 To read an entity value, use the `?` operator. To write at the entity slot, use the `!` operator.
 
+```assembly
     dead bool as 1
     when ?bool : tell['true']
     else : tell['false']
@@ -107,7 +113,8 @@ To read an entity value, use the `?` operator. To write at the entity slot, use 
     else : tell['false']
     
     >>> false
-    
+```
+
 ## Operators
 
   `mul` : same of `*`<br/>
@@ -146,19 +153,21 @@ Lines that are executed when something evaluates to true or false.
 ## Jump line
 `remember <date>` jumps to line `date`. Useful for loops. e.g.
 
-    1  soul num as 0
-    2
-    3  tell[?num]
-    4  tell['\n']
-    5
-    6  !num as ?num pls 1
-    7
-    8  when ?num sme 3 : rebember 3
-    
-    >>> 0
-    >>> 1
-    >>> 2
-    >>> 3
+```assembly
+1  soul num as 0
+2
+3  tell[?num]
+4  tell['\n']
+5
+6  !num as ?num pls 1
+7
+8  when ?num sme 3 : rebember 3
+
+>>> 0
+>>> 1
+>>> 2
+>>> 3
+```
 
 ### Graveyards
 A growable array of the same or different value types.
@@ -166,37 +175,40 @@ A growable array of the same or different value types.
   ``@<graveyard-name>.<index>`` returns the value at the index.<br/>
   ``!<graveyard-name>.<index>`` set a new value at the index.<br/>
   ``@<graveyard-name>.len`` returns the length of the graveyard.
+    
+```assembly
+graveyard fruits as ('apple', 'banana', 'pineapple')
+tell[@fruits.1] ;index starts at 1
 
-    graveyard fruits as ('apple', 'banana', 'pineapple')
-    tell[@fruits.1] ;index starts at 1
+>>> apple
 
-    >>> apple
+!fruits.@fruits.len pls 1 as 'pineapple'
+tell[@fruits.@fruits.len]
 
-    !fruits.@fruits.len pls 1 as 'pineapple'
-    tell[@fruits.@fruits.len]
-
-    >>> pineapple
+>>> pineapple
+```
 
 ### Corpses
-An corpse is an external `.g` file that is loaded inside the main file. (acts like the `dofile` in Lua).
-    
-    ;corpuse.gh
-    necro as entry
-    spell necro[_]:
-    
-    tell['hello, ' pls ?name pls '!']
-    end.
+An corpse is an external `.gh` file that is loaded inside the main file. (acts like the `dofile` in Lua).
 
-    ;main.gh
-    main as entry
-    spell main[_]:
-    
-    dead name as 'user'
-    exhume corpuse ;or corpuse.g
-    end.
-    
-    >>> hello, user!
-    
+```assembly
+;corpuse.gh
+necro as entry
+spell necro[_]:
+
+tell['hello, ' pls ?name pls '!']
+end.
+
+;main.gh
+main as entry
+spell main[_]:
+
+dead name as 'user'
+exhume corpuse ;or corpuse.gh
+end.
+
+>>> hello, user!
+```
 ### Libs
 External `.lua` file that works as a internal Ghost lib. Use `invoke <module-name>` to load the file.
 
