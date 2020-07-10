@@ -102,7 +102,7 @@ In a grave, there are only two types of information: names and dates.
 To read an entity value, use the `?` operator. To write at the entity slot, use the `!` operator.
 
 ```assembly
-    dead bool as 1
+    soul bool as 1
     when ?bool : tell['true']
     else : tell['false']
     
