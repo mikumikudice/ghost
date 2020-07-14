@@ -2,6 +2,7 @@
 \* Multi sspell callers (e.g. awake #\[one\[#two\[\_]])
 \+ Forget function
 \- Duplicated entities bug (souls and deads with same name)
+\- Math lib bug (attempt to call a nil value (global 'unpack'))
 
 ## 1.1.4
 \- 1.1.3 when block bug ('\[-+]%d+%.%d*' -> '\[-+]%d+%.?%d*')<br/>
