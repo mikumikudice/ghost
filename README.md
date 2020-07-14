@@ -86,17 +86,17 @@ Read and write values from or to user.
 ### Entities
 Memory slots to read/write data. It can be `soul`s or `dead`s.
 
-* ``soul <name> as <value>`` creates a global mutable entity.
+* `soul <name> as <value>` creates a global mutable entity.
 
-* ``dead <name> as <value>`` creates a global immutable entity.
+* `dead <name> as <value>` creates a global immutable entity.
 
-* ``graveyard <name> as (<values>,)`` creates a mutable array of values. (See Graveyards)
+* `graveyard <name> as (<values>,)` creates a mutable array of values. (See Graveyards)
 
 ## Entity types
 In a grave, there are only two types of information: names and dates.
 
-``as 'name'`` : textual information, created with single quotes.<br/>
-``as <date>`` : numeric information, which can be integer (`1`, `-20`) or floating point (`0.85`, `-2.5`).
+`as 'name'` : textual information, created with single quotes.<br/>
+`as <date>` : numeric information, which can be integer (`1`, `-20`) or floating point (`0.85`, `-2.5`).
 
 ## Read and write
 To read an entity value, use the `?` operator. To write at the entity slot, use the `!` operator.
@@ -114,6 +114,8 @@ To read an entity value, use the `?` operator. To write at the entity slot, use 
     
     >>> false
 ```
+
+`forget <entity>` : Erases entity from memory.
 
 ## Operators
 
