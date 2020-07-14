@@ -1,3 +1,8 @@
+## 1.1.5
+\* Multi sspell callers (e.g. awake #\[one\[#two\[\_]])
+\+ Forget function
+\- Duplicated entities bug (souls and deads with same name)
+
 ## 1.1.4
 \- 1.1.3 when block bug ('\[-+]%d+%.%d*' -> '\[-+]%d+%.?%d*')<br/>
 \- rt, sml, gre, sle bug (attempt to compare string with number)
