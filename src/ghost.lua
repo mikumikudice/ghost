@@ -453,7 +453,7 @@ function ghst_arg(spell)
     local out = spell:match('%[(.+)%]')
     
     -- No args --
-    if out == "_" then return "" end
+    if out == "_" then return {""} end
     
     if out:find(',(%s*)') then
 
@@ -1014,15 +1014,16 @@ function ghst_run(lines)
 
     -- Cannot give args to the main spell --
     local marg = ghst_arg(lines[clin - 1])
-    if marg ~= '' then
+    if marg[1] ~= '' then
         
         local elin = lines[clin - 1]
         return ghst_err(ATIN, elin:find(marg[1]), elin, clin)
     end
 
     -- Spells --
-    local call
     local rtrn
+    local c_cl = 0
+    local call = {}
     local sarg = {}
 
 --# Main chunck --------------------------------------------#--
@@ -1056,13 +1057,12 @@ function ghst_run(lines)
                 line = line:sub(1, fdx - 1) .. rtrn .. line:sub(ldx + 1)
 
                 -- Reset params --
-                call = nil
                 rtrn = nil
                 spll = nil
             end
 
             -- Read values --
-            while line:match('%?([%w_]+)') do
+            while line:match('%?[%w_]+') do
 
                 local var = line:match('%?([%w_]+)')
 
@@ -1090,7 +1090,7 @@ function ghst_run(lines)
             end
 
             -- Read graveyard length --
-            while line:match('@([%w_]+)%.len') do
+            while line:match('@[%w_]+%.len') do
 
                 local pat = line:match('@[%w_]+%.len')
                 local var, val = line:match('@([%w_]+)%.len')
@@ -1111,7 +1111,7 @@ function ghst_run(lines)
             line = ghst_opr(clin, line, elin)
 
             -- Read graveyard values --
-            while line:match('@([%w_]+)%.([%w%p]+)') do
+            while line:match('@[%w_]+%.[%w%p]+') do
 
                 -- Error --
                 if type(line) == 'table' then return line.err end
@@ -1295,9 +1295,12 @@ function ghst_run(lines)
         --# Running ---------------------------------------#--
         
             -- Call spell -- 
-            if line:match('#[%w_]+%[([-+]?%d+%.%d*)%]')
-            or line:match('#[%w_]+%[(\'[%w%p]*\')%]') then
-    
+            if line:match('#[%w_]+%[[-+]?%d+%.%d*%]')
+            or line:match('#[%w_]+%[\'[%w%p]*\'%]')
+            or line:match('#[%w_]+%[_%]') then
+
+                c_cl = c_cl + 1
+
                 local spll = line:match('#[%w_]+%[[-+%d%._]+%]')
                 or line:match('#[%w_]+%[\'[%w%p]*\'%]')
 
@@ -1315,14 +1318,14 @@ function ghst_run(lines)
                     local targ = ghst_arg(spll)
                     sarg = ghst_arg(lines[slin])
 
-                    if sarg == '' and targ == '' then
+                    if sarg[1] == '' and targ[1] == '' then
 
                         -- No arg given, no arg got --
 
-                    elseif targ ~= '' then
+                    elseif targ[1] ~= '' then
 
                         -- Spare arguments --
-                        if sarg == '' then
+                        if sarg[1] == '' then
                             
                             return error(SGSA, line:find('%[.+%]:') + 1, elin, clin)
                         else
@@ -1360,7 +1363,7 @@ function ghst_run(lines)
                         return error(MRSA, line:find('%[.+%]:') + 1, elin, clin)
                     end
 
-                    call = clin
+                    call[c_cl] = clin
                     clin = slin
                 end
 
@@ -1369,20 +1372,20 @@ function ghst_run(lines)
 
             -- End of script / return --
             if line == 'end.'
-            or line:match('^awake (.*)') then
+            or line:match('^awake .*') then
 
                 local outv = line:match('awake (.*)')
 
                 if outv then
 
                     -- Spell return --
-                    if call then
-                        
+                    if call[c_cl] then
+
                         -- Store value --
                         rtrn = outv
 
                         -- Go back to original line --
-                        clin = call - 1
+                        clin = call[c_cl] - 1
 
                         -- Delete local entities --
                         for _, n in pairs(sarg) do
@@ -1394,18 +1397,22 @@ function ghst_run(lines)
 
                 -- Only return from --
                 -- ghst_run at main --
-                if not call then
+                if not call[c_cl] then
 
                     return '\n\n'.. fname .. ' died successfully and returned '
                     .. (outv or 'NONE')
                 end
 
+                -- Clear data --
+                call[c_cl] = nil
+                c_cl = math.max(c_cl - 1, 0)
+
                 line = ''
             end
 
             -- Load external component --
-            if line:match('^exhume ([%w_]+)')
-            or line:match('^exhume ([%w_]+%.gh)') then
+            if line:match('^exhume [%w_]+')
+            or line:match('^exhume [%w_]+%.gh') then
 
                 local o_name = fname
                 local corpse = line:match('exhume ([%w_]+)')
@@ -1431,7 +1438,7 @@ function ghst_run(lines)
             end
 
             -- Load internel lib --
-            if line:match('^invoke ([%w_]+)') then
+            if line:match('^invoke [%w_]+') then
 
                 local lib = line:match('invoke ([%w_]+)')
 
@@ -1471,13 +1478,19 @@ function ghst_run(lines)
             end
 
             -- Instantiate a soul -- 
-            if line:match('^soul ([%w_]+) as (.+)') then
+            if line:match('^soul [%w_]+ as .+') then
 
                 local var, val = line:match('soul ([%w%d_]+) as (.+)')
 
                 -- Soul was not assigned yet --
                 if not souls[var] then
                     
+                    -- Duplicated variable --
+                    if deads[var] then
+
+                        return ghst_err(ATRE, line:find(var, 1, true), elin, clin)
+                    end
+
                     -- Valid type --
                     if ghst_ist(val) then
 
@@ -1502,7 +1515,7 @@ function ghst_run(lines)
             end
 
             -- Instantiate a dead --
-            if line:match('^dead ([%w_]+) as (.+)') then
+            if line:match('^dead [%w_]+ as .+') then
 
                 local var, val = line:match('dead ([%w%d_]+) as (.+)')
 
@@ -1533,7 +1546,7 @@ function ghst_run(lines)
             end
 
             -- Graveyards --
-            if line:match('^graveyard ([%w_]+) as %((.+,?)%)') then
+            if line:match('^graveyard [%w_]+ as %(.+,?%)') then
 
                 local grvy, vals = line:match('graveyard ([%w_]+) as %((.+,?)%)')
                 
@@ -1579,7 +1592,7 @@ function ghst_run(lines)
             end
 
             -- Assign an value --
-            if line:match('^%!([%w_]+) as ([%w%p]+)') then
+            if line:match('^%![%w_]+ as [%w%p]+') then
 
                 local var, val = line:match('%!([%w%d_]+) as ([%w%p]+)')
 
@@ -1612,7 +1625,7 @@ function ghst_run(lines)
             end
 
             -- Assign a value to a graveyard --
-            if line:match('^%!([%w_]+)%.(%d+) as ([%w%p]+)') then
+            if line:match('^%![%w_]+%.%d+ as [%w%p]+') then
 
                 local var, idx, val = line:match('%!([%w%d_]+)%.(%d+) as ([%w%p]+)')
 
@@ -1641,7 +1654,7 @@ function ghst_run(lines)
             end
 
             -- Output --
-            if line:match('^tell%[(.*)%]') then
+            if line:match('^tell%[.*%]') then
 
                 local out = line:match('tell%[(\'[%w%p_]*\')%]')
                 or line:match('tell%[([-+]?%d+%.?%d*)%]')
@@ -1686,6 +1699,25 @@ function ghst_run(lines)
                 line = ''
             end
 
+            -- Dell variable --
+            if line:match('^forget [%w_]+') then
+                
+                local var = line:match('^forget [%w_]+')
+
+                -- Forget an soul --
+                if souls[var] then
+
+                    souls[var] = nil
+
+                -- Forget an dead --
+                elseif deads[var] then
+
+                    deads[var] = nil
+                end
+
+                line = ''
+            end
+
             -- Strange line --
             if line ~= '' then
                 
@@ -1722,7 +1754,7 @@ if arg[1] and arg[1] ~= '' then
 -- Open file --
 else
     
-    hello = 'GHOST 1.1.4 - Using leaf core | by Mateus M. Dias'
+    hello = 'GHOST 1.1.5 - Using leaf core | by Mateus M. Dias'
 
     print(hello)
     print(string.rep('=', #hello) .. '\n')
