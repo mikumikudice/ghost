@@ -1,8 +1,12 @@
+## 1.1.6
+\* Possibility to instantiate empty graveyards<br/>
+\+ Error catcher for invoked libs
+
 ## 1.1.5
-\* Multi sspell callers (e.g. awake #\[one\[#two\[\_]])
-\+ Forget function
-\- Duplicated entities bug (souls and deads with same name)
-\- Math lib bug (attempt to call a nil value (global 'unpack'))
+\* Multi sspell callers (e.g. awake #\[one\[#two\[\_]])<br/>
+\+ Forget function<br/>
+\- Duplicated entities bug (souls and deads with same name)<br/>
+\- Math lib bug (attempt to call a nil value (global 'unpack'))<br/>
 
 ## 1.1.4
 \- 1.1.3 when block bug ('\[-+]%d+%.%d*' -> '\[-+]%d+%.?%d*')<br/>
