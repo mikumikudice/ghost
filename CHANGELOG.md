@@ -1,5 +1,5 @@
 ## 1.1.7
-\* Better compiling (fixed (possible) string missmatch/added new internal scape chars)<br/>
+\* Better compiling (fixed (possible) string missmatch/added new internal escape chars)<br/>
 \* Path loading to external files
 \* Other code changes
 
