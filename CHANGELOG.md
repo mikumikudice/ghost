@@ -1,3 +1,8 @@
+## 1.1.7
+\* Better compiling (fixed (possible) string missmatch/added new internal scape chars)<br/>
+\* Path loading to external files
+\* Other code changes
+
 ## 1.1.6
 \* Possibility to instantiate empty graveyards<br/>
 \+ Error catcher for invoked libs
