@@ -1,5 +1,6 @@
 require 'leaf'
 
+local fpath
 local fname
 local entry
 local souls = {}
@@ -472,16 +473,25 @@ function load_file(name, subf)
 
     if name:sub(-3) ~= '.gh' then
         
-        name = name .. '.gh'
-    end
-
-    -- Return name --
-    fname = name:sub(1, -4):upper()
+        fname = name
+        name  = name .. '.gh'
     
+    else fname = name:sub(1, -4) end
+
+    -- Just assign if is nil (first load) --
+    local ismain = not fpath
+    if ismain then fpath = fname end
+
     -- Get only file name --
     while fname:find('/') do
         
         fname = fname:sub(math.max(fname:find('/')) + 1)
+    end
+
+    -- File path --
+    if ismain then
+
+        fpath = fpath:gsub(fname, '')
     end
 
     -- Only show running message --
@@ -494,12 +504,18 @@ function load_file(name, subf)
         print(string.rep('=', #msg - 1))
     end
 
+    -- Load name --
+    local lname = fname
+
+    -- Return message name --
+    fname = fname:upper()
+
     -- If file exists --
-    if io.open(name) then
+    if io.open(fpath .. lname .. '.gh') then
 
         local l_num = 1
 
-        for line in io.lines(name) do
+        for line in io.lines(fpath .. lname .. '.gh') do
 
             -- Fix double spaces --
             line = line:gsub('%s(%s+)', ' ')
@@ -549,6 +565,15 @@ function load_file(name, subf)
                         
                         local tstr = line:sub(fidx, i)
                         local nstr = tstr:gsub(' ', '\\s')
+
+                        -- Replace pontuaction --
+                        nstr = nstr:gsub(',', '\\c')
+
+                        nstr = nstr:gsub('%(', '\\p')
+                        nstr = nstr:gsub('%)', '\\P')
+
+                        nstr = nstr:gsub('%[', '\\r')
+                        nstr = nstr:gsub('%]', '\\R')
 
                         pair[tstr] = nstr
                         fidx = nil
@@ -670,14 +695,22 @@ function ghst_str(str)
     
     -- Meta chars --
     str = str:gsub('\\s', ' ')
+
     str = str:gsub('\\t', '\t')
     str = str:gsub('\\n', '\n')
+
     str = str:gsub('\\\'', '\'')
+
+    nstr = str:gsub('\\c', ',')
+    nstr = str:gsub('\\p', '(')
+    nstr = str:gsub('\\P', ')')
+    nstr = str:gsub('\\r', '[')
+    nstr = str:gsub('\\R', ']')
 
     return str:sub(2, -2)
 end
 
-function ghst_opr(clin, line, elin)
+function ghst_opr(line, elin, clin)
     
     -- Operation inside parentheses --
     for idx, def in pairs(oper) do
@@ -1108,7 +1141,7 @@ function ghst_run(lines)
             end
 
             -- Calculations before reading --
-            line = ghst_opr(clin, line, elin)
+            line = ghst_opr(line, elin, clin)
 
             -- Read graveyard values --
             while line:match('@[%w_]+%.[%w%p]+') do
@@ -1204,7 +1237,7 @@ function ghst_run(lines)
             end
 
             -- Operations after reading --
-            line = ghst_opr(clin, line, elin)
+            line = ghst_opr(line, elin, clin)
 
             -- Error --
             if type(line) == 'table' then return line.err end
@@ -1212,7 +1245,7 @@ function ghst_run(lines)
             -- Internal libs --
             for _, fun in pairs(i_lib) do
                 
-                line = fun(line, clin)
+                line = fun(line, elin, clin)
 
                 if type(line) == 'table' then
                     
@@ -1757,7 +1790,7 @@ if arg[1] and arg[1] ~= '' then
 -- Open file --
 else
     
-    hello = 'GHOST 1.1.6 - Using leaf core | by Mateus M. Dias'
+    hello = 'GHOST 1.1.7 - Using leaf core | by Mateus M. Dias'
 
     print(hello)
     print(string.rep('=', #hello) .. '\n')
