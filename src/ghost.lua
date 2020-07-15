@@ -1212,7 +1212,7 @@ function ghst_run(lines)
             -- Internal libs --
             for _, fun in pairs(i_lib) do
                 
-                line = fun(line)
+                line = fun(line, clin)
 
                 if type(line) == 'table' then
                     
@@ -1546,43 +1546,46 @@ function ghst_run(lines)
             end
 
             -- Graveyards --
-            if line:match('^graveyard [%w_]+ as %(.+,?%)') then
+            if line:match('^graveyard [%w_]+ as %(.*,?%)') then
 
-                local grvy, vals = line:match('graveyard ([%w_]+) as %((.+,?)%)')
+                local grvy, vals = line:match('graveyard ([%w_]+) as %((.*,?)%)')
                 
                 -- Graveyard was not assigned yet --
                 if not graveyard[grvy] then
                 
                     graveyard[grvy] = {}
 
-                    -- Remove last comma --
-                    if vals:sub(-1) == ',' then
-                        
-                        vals = vals:sub(1, -2)
-                    end
+                    if vals ~= '' then 
 
-                    -- Split --
-                    local arr = leaf.string_split(vals, ',%s?')
-                    if type(arr) == 'string' then arr = {arr} end
-
-                    for l, val in pairs(arr) do
-
-                        -- Valid type --
-                        if ghst_ist(val) then
-
-                            local v_tp = ghst_ent(val)
-
-                            -- Remove quotes --
-                            if v_tp == 'name' then
-                                
-                                graveyard[grvy][l] = val:sub(2, -2)
-
-                            else graveyard[grvy][l] = val end
-                        
-                        -- Invalid type --
-                        else
+                        -- Remove last comma --
+                        if vals:sub(-1) == ',' then
                             
-                            return ghst_err(IGVT, line:find(val, 1, true), elin, clin)
+                            vals = vals:sub(1, -2)
+                        end
+
+                        -- Split --
+                        local arr = leaf.string_split(vals, ',%s?')
+                        if type(arr) == 'string' then arr = {arr} end
+
+                        for l, val in pairs(arr) do
+
+                            -- Valid type --
+                            if ghst_ist(val) then
+
+                                local v_tp = ghst_ent(val)
+
+                                -- Remove quotes --
+                                if v_tp == 'name' then
+                                    
+                                    graveyard[grvy][l] = val:sub(2, -2)
+
+                                else graveyard[grvy][l] = val end
+                            
+                            -- Invalid type --
+                            else
+                                
+                                return ghst_err(IGVT, line:find(val, 1, true), elin, clin)
+                            end
                         end
                     end
 
@@ -1754,7 +1757,7 @@ if arg[1] and arg[1] ~= '' then
 -- Open file --
 else
     
-    hello = 'GHOST 1.1.5 - Using leaf core | by Mateus M. Dias'
+    hello = 'GHOST 1.1.6 - Using leaf core | by Mateus M. Dias'
 
     print(hello)
     print(string.rep('=', #hello) .. '\n')
