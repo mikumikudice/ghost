@@ -1059,7 +1059,7 @@ function ghst_run(lines)
     local call = {}
     local sarg = {}
 
---# Main chunck --------------------------------------------#--
+--# Main chunk ---------------------------------------------#--
 
     while true do
         
