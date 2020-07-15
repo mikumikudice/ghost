@@ -722,10 +722,10 @@ function ghst_opr(line, elin, clin)
         local sub = ' ' .. op .. ' '
 
         -- Single value inside parentheses --
-        while line:match('%([-+]?%d+%.?%d+%)') do
+        while line:match('%([-+]?%d+%.?%d*e?[-+]?%d*%)') do
                     
-            local val = line:match('%([-+]?%d+%.?%d+%)')
-            local rpl = line:match('%(([-+]?%d+%.?%d+)%)')
+            local val = line:match('%([-+]?%d+%.?%d*e?[-+]?%d*%)')
+            local rpl = line:match('%(([-+]?%d+%.?%d*e?[-+]?%d*)%)')
 
             line = line:gsub(val, rpl)
         end
@@ -736,9 +736,9 @@ function ghst_opr(line, elin, clin)
             local lft, rgt
 
             -- Two dates --
-            if line:match('%(([-+]?%d+%.?%d*)' .. sub .. '([-+]?%d+%.?%d*)%)') then
+            if line:match('%(([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)%)') then
             
-                lft, rgt = line:match('%(([-+]?%d+%.?%d*)' .. sub .. '([-+]?%d+%.?%d*)%)')
+                lft, rgt = line:match('%(([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)%)')
 
             -- Two names -- 
             elseif line:match('%((\'[%w%p]*\')' .. sub .. '(\'[%w%p]*\')%)') then
@@ -746,27 +746,27 @@ function ghst_opr(line, elin, clin)
                 lft, rgt = line:match('%((\'[%w%p]*\')' .. sub .. '(\'[%w%p]*\')%)')
 
             -- name ~ date --
-            elseif line:match('%((\'[%w%p]*\')' .. sub .. '([-+]?%d+%.?%d*)%)') then
+            elseif line:match('%((\'[%w%p]*\')' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)%)') then
 
-                lft, rgt = line:match('%((\'[%w%p]*\')' .. sub .. '([-+]?%d+%.?%d*)%)')
+                lft, rgt = line:match('%((\'[%w%p]*\')' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)%)')
 
             -- date ~ name --
-            elseif line:match('%(([-+]?%d+%.?%d*)' .. sub .. '(\'[%w%p]*\')%)') then
+            elseif line:match('%(([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '(\'[%w%p]*\')%)') then
 
-                lft, rgt = line:match('%(([-+]?%d+%.?%d*)' .. sub .. '(\'[%w%p]*\')%)')
+                lft, rgt = line:match('%(([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '(\'[%w%p]*\')%)')
 
             else
 
                 -- Get the null match --
                 local lt, rt
-                lt = line:match('([-+]?%d+%.?%d*)' .. sub)
+                lt = line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub)
                 or line:match('(\'[%w%p]*\')' .. sub)
                 or line:match('(\'[%w%p]*\')' .. sub)
-                or line:match('([-+]?%d+%.?%d*)' .. sub)
+                or line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub)
 
-                rt = line:match(sub .. '([-+]?%d+%.?%d*)')
+                rt = line:match(sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)')
                 or line:match(sub .. '(\'[%w%p]*\')')
-                or line:match(sub .. '([-+]?%d+%.?%d*)')
+                or line:match(sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)')
                 or line:match(sub .. '(\'[%w%p]*\')')
 
                 local efnd
@@ -894,9 +894,9 @@ function ghst_opr(line, elin, clin)
             local lft, rgt
 
             -- Two dates --
-            if line:match('([-+]?%d+%.?%d*)' .. sub .. '([-+]?%d+%.?%d*)') then
+            if line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)') then
             
-                lft, rgt = line:match('([-+]?%d+%.?%d*)' .. sub .. '([-+]?%d+%.?%d*)')
+                lft, rgt = line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)')
 
             -- Two names -- 
             elseif line:match('(\'[%w%p]*\')' .. sub .. '(\'[%w%p]*\')') then
@@ -904,27 +904,27 @@ function ghst_opr(line, elin, clin)
                 lft, rgt = line:match('(\'[%w%p]*\')' .. sub .. '(\'[%w%p]*\')')
 
             -- name ~ date --
-            elseif line:match('(\'[%w%p]*\')' .. sub .. '([-+]?%d+%.?%d*)') then
+            elseif line:match('(\'[%w%p]*\')' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)') then
 
-                lft, rgt = line:match('(\'[%w%p]*\')' .. sub .. '([-+]?%d+%.?%d*)')
+                lft, rgt = line:match('(\'[%w%p]*\')' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)')
 
             -- date ~ name --
-            elseif line:match('([-+]?%d+%.?%d*)' .. sub .. '(\'[%w%p]*\')') then
+            elseif line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '(\'[%w%p]*\')') then
 
-                lft, rgt = line:match('([-+]?%d+%.?%d*)' .. sub .. '(\'[%w%p]*\')')
+                lft, rgt = line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '(\'[%w%p]*\')')
 
             else
 
                 -- Get the null match --
                 local lt, rt
-                lt = line:match('([-+]?%d+%.?%d*)' .. sub)
+                lt = line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub)
                 or line:match('(\'[%w%p]*\')' .. sub)
                 or line:match('(\'[%w%p]*\')' .. sub)
-                or line:match('([-+]?%d+%.?%d*)' .. sub)
+                or line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub)
 
-                rt = line:match(sub .. '([-+]?%d+%.?%d*)')
+                rt = line:match(sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)')
                 or line:match(sub .. '(\'[%w%p]*\')')
-                or line:match(sub .. '([-+]?%d+%.?%d*)')
+                or line:match(sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)')
                 or line:match(sub .. '(\'[%w%p]*\')')
 
                 local efnd
@@ -1143,6 +1143,9 @@ function ghst_run(lines)
             -- Calculations before reading --
             line = ghst_opr(line, elin, clin)
 
+            -- Error --
+            if type(line) == 'table' then return line.err end
+
             -- Read graveyard values --
             while line:match('@[%w_]+%.[%w%p]+') do
 
@@ -1179,7 +1182,7 @@ function ghst_run(lines)
             while line:match('read%[(.+)%]') do
 
                 local arg = line:match('read%[(\'[%w%p_]*\')%]')
-                or line:match('read%[([-+]?%d+%.?%d*)%]')
+                or line:match('read%[([-+]?%d+%.?%d*e?[-+]?%d*)%]')
                 or line:match('read%[(_)%]') 
                 
                 if not arg then
@@ -1219,9 +1222,9 @@ function ghst_run(lines)
                     line = line:gsub(opr .. ' 0', ' 1')
                 end
 
-                if line:match(opr .. ' [-+]?%d+%.?%d*') then
+                if line:match(opr .. ' [-+]?%d+%.?%d*e?[-+]?%d*') then
                     
-                    line = line:gsub(opr .. ' [-+]?%d+%.?%d*', ' 0')
+                    line = line:gsub(opr .. ' [-+]?%d+%.?%d*e?[-+]?%d*', ' 0')
                 end
             end
 
@@ -1291,7 +1294,7 @@ function ghst_run(lines)
                     line = line:gsub(key, val)
                 end
 
-                local truth = line:match('^when ([-+]?%d+%.?%d*)%s?:')
+                local truth = line:match('^when ([-+]?%d+%.?%d*e?[-+]?%d*)%s?:')
 
                 -- Logic status --
                 stat[c_sc] = truth ~= '0'
@@ -1299,7 +1302,7 @@ function ghst_run(lines)
                 -- Evaluated True --
                 if stat[c_sc] then
                     
-                    line = line:gsub('^when [-+]?%d+%.?%d*%s?:%s?', '')
+                    line = line:gsub('^when [-+]?%d+%.?%d*e?[-+]?%d*%s?:%s?', '')
                 
                 -- If not the line --
                 -- will be ignored --
@@ -1693,7 +1696,7 @@ function ghst_run(lines)
             if line:match('^tell%[.*%]') then
 
                 local out = line:match('tell%[(\'[%w%p_]*\')%]')
-                or line:match('tell%[([-+]?%d+%.?%d*)%]')
+                or line:match('tell%[([-+]?%d+%.?%d*e?[-+]?%d*)%]')
                 
                 if not out then
 
