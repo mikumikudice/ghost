@@ -1,3 +1,6 @@
+## 1.1.9
+\+ Forget function now can erease graveyards
+
 ## 1.1.8
 \+ Support for numbers in scientific notation<br/>
 \* Missing error catcher in 1st ghst_opr()
