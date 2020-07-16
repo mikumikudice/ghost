@@ -1752,6 +1752,10 @@ function ghst_run(lines)
                 elseif deads[var] then
 
                     deads[var] = nil
+
+                elseif graveyard[var] then
+
+                    graveyard[var] = nil
                 end
 
                 line = ''
@@ -1793,7 +1797,7 @@ if arg[1] and arg[1] ~= '' then
 -- Open file --
 else
     
-    hello = 'GHOST 1.1.7 - Using leaf core | by Mateus M. Dias'
+    hello = 'GHOST 1.1.9 - Using leaf core | by Mateus M. Dias'
 
     print(hello)
     print(string.rep('=', #hello) .. '\n')
