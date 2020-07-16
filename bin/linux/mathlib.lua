@@ -3,9 +3,7 @@ math.randomseed(os.time())
 -- Version conflict --
 if not unpack then unpack = table.unpack end
 
-function runlib(line, clin)
-    
-    local elin = line
+function runlib(line, elin, clin)
 
     local mathf = {
 
