@@ -12,7 +12,7 @@ tell['Hello world!']
 end.
 ```
     
-Current version: 1.1.10
+Current version: 1.1.11
 
 ## Introduction
 Ghost is an interpreter forged to kill programs. To kill them, it must make the code fulfill its purpose so that it can die in peace.
