@@ -4,7 +4,7 @@
 \- Bug in ghst_opr (function returning wrong error format)<br/>
 \- Spell internal return bug<br/>
 \- Other compiling bugs<br/>
-\+ OOP Suport (for Phantom class)
+\+ OOP Suport (for Phantom lib)
 
 ## 1.1.9
 \+ Forget function now can erease graveyards
