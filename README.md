@@ -184,7 +184,7 @@ tell[@fruits.1] ;index starts at 1
 
 >>> apple
 
-!fruits.@fruits.len pls 1 as 'pineapple'
+!fruits.(@fruits.len pls 1) as 'pineapple'
 tell[@fruits.@fruits.len]
 
 >>> pineapple
