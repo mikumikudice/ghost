@@ -1,5 +1,7 @@
 require 'leaf'
 
+local GHVER = '1.1.10'
+
 local fpath
 local fname
 local entry
@@ -423,6 +425,19 @@ local o_nm = {
     [13] = 'or' ,
 }
 
+function read_grave(name)
+    
+    return leaf.table_copy((graveyard[name] or {none = true}))
+end
+
+function bury_grave(name, body)
+    
+    if name then
+        
+        graveyard[name] = (body or {})
+    end
+end
+
 function read(string)
     
     io.write(string)
@@ -776,7 +791,7 @@ function ghst_opr(line, elin, clin)
                 
                 else
 
-                    efnd = elin:find(elin:match('([%w%p]+)' .. sub))
+                    efnd = elin:find(elin:match('([%w%p]+)' .. sub), 1, true)
                 end
 
                 return {err = ghst_err(APAU, efnd, elin, clin)}
@@ -866,9 +881,9 @@ function ghst_opr(line, elin, clin)
 
                 -- check if graveyard index exits --
                 if graveyard[var][val] then val = graveyard[var][val]
-                else return ghst_err(GIOR, line:find(val, 1, true), elin, clin) end
+                else return {err = ghst_err(GIOR, line:find(val, 1, true), elin, clin)} end
 
-            else return ghst_err(ATRU, line:find(var, 1, true), elin, clin) end
+            else return {err = ghst_err(ATRU, line:find(var, 1, true), elin, clin)} end
 
             if not tonumber(val) then
                 
@@ -934,7 +949,7 @@ function ghst_opr(line, elin, clin)
                 
                 else
 
-                    efnd = elin:find(elin:match('([%w%p]+)' .. sub))
+                    efnd = elin:find(elin:match('([%w%p]+)' .. sub), 1, true)
                 end
                 
                 return {err = ghst_err(APAU, efnd, elin, clin)}
@@ -1129,7 +1144,7 @@ function ghst_run(lines)
                 local var, val = line:match('@([%w_]+)%.len')
 
                 -- Check if value is not inside of a string --
-                if not line:find('\'[%w_]*@' .. var .. '%.len[%w_]*\'') then
+                if not line:find('\'[%w%p]*@' .. var .. '%.len[%w%p]*\'') then
 
                     -- check if graveyard exists --
                     if graveyard[var] then
@@ -1147,16 +1162,16 @@ function ghst_run(lines)
             if type(line) == 'table' then return line.err end
 
             -- Read graveyard values --
-            while line:match('@[%w_]+%.[%w%p]+') do
+            while line:match('@[%w_]+%.%d+') do
 
                 -- Error --
                 if type(line) == 'table' then return line.err end
 
-                local pat = line:match('@[%w_]+%.[%w%p]+')
-                local var, val = line:match('@([%w_]+)%.([%w%p]+)')
+                local pat = line:match('@[%w_]+%.%d+')
+                local var, val = line:match('@([%w_]+)%.(%d+)')
 
                 -- Check if value is not inside of a string --
-                if not line:find('\'[%w_]*@' .. var .. '%.' .. val .. '[%w_]*\'') then
+                if not line:find('\'[%w%p]*@' .. var .. '%.' .. val .. '[%w%p]*\'') then
 
                     -- check if graveyard exists --
                     if graveyard[var] then
@@ -1181,7 +1196,7 @@ function ghst_run(lines)
             -- Input --
             while line:match('read%[(.+)%]') do
 
-                local arg = line:match('read%[(\'[%w%p_]*\')%]')
+                local arg = line:match('read%[(\'[%w%p]*\')%]')
                 or line:match('read%[([-+]?%d+%.?%d*e?[-+]?%d*)%]')
                 or line:match('read%[(_)%]') 
                 
@@ -1246,8 +1261,14 @@ function ghst_run(lines)
             if type(line) == 'table' then return line.err end
 
             -- Internal libs --
-            for _, fun in pairs(i_lib) do
+            for lib, fun in pairs(i_lib) do
                 
+                if type(fun) ~= 'function' then
+
+                    return ghst_err('Developer error: ' .. lib
+                    .. ' do not returned an function')
+                end
+
                 line = fun(line, elin, clin)
 
                 if type(line) == 'table' then
@@ -1480,7 +1501,7 @@ function ghst_run(lines)
 
                 if io.open(lib .. '.lua') then
                 
-                    table.insert(i_lib, require(lib))
+                    i_lib[lib] = require(lib)
                 
                 else
                     
@@ -1494,19 +1515,16 @@ function ghst_run(lines)
             if line == 'end' then
 
                 -- Return to call line --
-                if call then
-                
-                    clin = call
-                    call = nil
+                if call[c_cl] then
+
+                    clin = call[c_cl]
+                    call[c_cl] = nil
 
                     -- Delete local entities --
                     for _, n in pairs(sarg) do
                         
                         souls[n] = nil
                     end
-
-                    -- Go back --
-                    clin = clin - 1
                 
                 else return ghst_err(WMSE, 1, elin, clin) end
 
@@ -1524,7 +1542,7 @@ function ghst_run(lines)
                     -- Duplicated variable --
                     if deads[var] then
 
-                        return ghst_err(ATRE, line:find(var, 1, true), elin, clin)
+                        return ghst_err(ATRE, elin:find(var, 1, true) or 1, elin, clin)
                     end
 
                     -- Valid type --
@@ -1542,10 +1560,10 @@ function ghst_run(lines)
                     -- Invalid type --
                     else
                         
-                        return ghst_err(IGVT, line:find(val, 1, true), elin, clin)
+                        return ghst_err(IGVT, elin:find(val, 1, true) or 1, elin, clin)
                     end
 
-                else return ghst_err(ATRE, line:find(var, 1, true), elin, clin) end
+                else return ghst_err(ATRE, elin:find(var, 1, true) or 1, elin, clin) end
 
                 line = ''
             end
@@ -1573,10 +1591,10 @@ function ghst_run(lines)
                     -- Invalid type --
                     else
                         
-                        return ghst_err(IGVT, line:find(val, 1, true), elin, clin)
+                        return ghst_err(IGVT, elin:find(val, 1, true) or 1, elin, clin)
                     end
 
-                else return ghst_err(ATRE, line:find(var, 1, true), elin, clin) end
+                else return ghst_err(ATRE, elin:find(var, 1, true) or 1, elin, clin) end
 
                 line = ''
             end
@@ -1585,7 +1603,7 @@ function ghst_run(lines)
             if line:match('^graveyard [%w_]+ as %(.*,?%)') then
 
                 local grvy, vals = line:match('graveyard ([%w_]+) as %((.*,?)%)')
-                
+
                 -- Graveyard was not assigned yet --
                 if not graveyard[grvy] then
                 
@@ -1695,7 +1713,7 @@ function ghst_run(lines)
             -- Output --
             if line:match('^tell%[.*%]') then
 
-                local out = line:match('tell%[(\'[%w%p_]*\')%]')
+                local out = line:match('tell%[(\'[%w%p]*\')%]')
                 or line:match('tell%[([-+]?%d+%.?%d*e?[-+]?%d*)%]')
                 
                 if not out then
@@ -1763,7 +1781,7 @@ function ghst_run(lines)
 
             -- Strange line --
             if line ~= '' then
-                
+
                 if not (line:match('^when 0%s?:%s?.*')
                 or line:match('^else%s?:%s?.*')
                 or line:match('^also%s?:%s?.*')) then
@@ -1797,7 +1815,7 @@ if arg[1] and arg[1] ~= '' then
 -- Open file --
 else
     
-    hello = 'GHOST 1.1.9 - Using leaf core | by Mateus M. Dias'
+    hello = 'GHOST ' .. GHVER .. ' - Using leaf core | by Mateus M. Dias'
 
     print(hello)
     print(string.rep('=', #hello) .. '\n')
