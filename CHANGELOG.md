@@ -1,3 +1,11 @@
+## 1.1.10
+\* Some internal changes<br/>
+\* Better compiling<br/>
+\- Bug in ghst_opr (function returning wrong error format)<br/>
+\- Spell internal return bug<br/>
+\- Other compiling bugs<br/>
+\+ OOP Suport (for Phantom class)
+
 ## 1.1.9
 \+ Forget function now can erease graveyards
 
