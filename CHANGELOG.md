@@ -1,3 +1,6 @@
+## 1.1.12
+\- Output bug (not replaing internal metachars)
+
 ## 1.1.11
 \* Better compiling (names behaviour and value replacement)<br/>
 \* Better error catching
