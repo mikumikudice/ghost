@@ -1,6 +1,6 @@
 require 'leaf'
 
-local GHVER = '1.1.13'
+local GHVER = '1.1.15'
 
 local fpath
 local fname
@@ -23,7 +23,7 @@ local ATJI = "Attempt to jump to an line out of range"
 local ACUS = "Attempt to call an undefined spell"
 local WMSE = "Wrong main spell ender (correct: \"end.\")"
 local MPKK = "Missing program killer keyword (\"end.\")"
-local SGSA = "Spell got spare arguments"
+local SGEA = "Spell got extra arguments"
 local MRSA = "Missing required spell arguments"
 
 local ATIN = "Attempt to initialize null entity"
@@ -481,9 +481,9 @@ function ghst_arg(spell)
     -- No args --
     if out == "_" then return {""} end
     
-    if out:find(',(%s*)') then
+    if out:find(',%s*') then
 
-        out = leaf.string_split(out, ',(%s*)')
+        out = leaf.string_split(out, ',%s*')
     end
 
     -- Allways return an table --
@@ -1111,14 +1111,15 @@ function ghst_run(lines)
             if rtrn then
 
                 -- Replace value --
-                local rsub = line:match('#[%w_]+%[[-+%d%._]+%]')
-                or line:match('#[%w_]+%[\'[^ ]*\'%]')
-                or line:match('#[%w_]+%[%?[%w_]+%]')
+                local rsub = line:match('#[%w_]+%[[-+%w%p, _]+%]')
+                
+                -- Missmatch --
+                if rsub:match('%]%]+') then
+                    
+                    rsub = rsub:gsub('%]%]+', ']')
+                end
 
-                -- Use string sub instead of --
-                -- gsub to avoid missmatches -- 
-                local fdx, ldx = line:find(rsub, 1, true)
-                line = line:sub(1, fdx - 1) .. rtrn .. line:sub(ldx + 1)
+                line = better_gsub(line, rsub, rtrn)
 
                 -- Reset params --
                 rtrn = nil
@@ -1369,16 +1370,19 @@ function ghst_run(lines)
         --# Running ---------------------------------------#--
         
             -- Call spell -- 
-            if line:match('#[%w_]+%[[-+]?%d+%.%d*%]')
-            or line:match('#[%w_]+%[\'[^ ]*\'%]')
-            or line:match('#[%w_]+%[_%]') then
+            if line:match('#[%w_]+%[[-+%w%p, _]+%]') then
 
                 c_cl = c_cl + 1
 
-                local spll = line:match('#[%w_]+%[[-+%d%._]+%]')
-                or line:match('#[%w_]+%[\'[^ ]*\'%]')
+                local spll = line:match('#[%w_]+%[[-+%w%p, _]+%]')
 
-                local name = elin:match('#([%w_]+)%[.+%]')
+                -- Missmatch --
+                if spll:match('%]%]+') then
+                    
+                    spll = spll:gsub('%]%]+', ']')
+                end
+
+                local name = line:match('#([%w_]+)%[[-+%w%p, _]+%]')
                 local slin = leaf.table_find(lines, 'spell ' .. name .. '%[.+%]:')
 
                 -- Spell not found --
@@ -1396,45 +1400,45 @@ function ghst_run(lines)
 
                         -- No arg given, no arg got --
 
-                    elseif targ[1] ~= '' then
-
-                        -- Spare arguments --
-                        if sarg[1] == '' then
-                            
-                            return error(SGSA, line:find('%[.+%]:') + 1, elin, clin)
-                        else
-
-                            for i, n in pairs(sarg) do
-                                
-                                -- Assign local entities --
-                                if not souls[n] then
-                                    
-                                    local a_tp = ghst_ent(targ[i])
-
-                                    -- Name arg --
-                                    if a_tp == 'name' then
-                                    
-                                        souls[n] = targ[i]:sub(2, -2)
-                                    
-                                    -- Date arg --
-                                    elseif a_tp == 'date' then
-                                    
-                                        souls[n] = targ[i]
-
-                                    -- Unknow type --
-                                    else
-                                    
-                                        return ghst_err(GIVT, line:find(targ[i]), elin, clin)
-                                    end
-
-                                else return ghst_err(ATRE, line:find(n), elin, clin) end
-                            end
-                        end
-
                     -- Missing args --
+                    elseif #sarg > #targ then
+
+                        local idx = spll:match('%[(.+)%]')
+                        return ghst_err(MRSA, elin:find(idx), elin, clin)
+                    
+                    -- Spare arguments --
+                    elseif #sarg < #targ then
+
+                        local idx = spll:match('%[(.+)%]')
+                        return ghst_err(SGEA, elin:find(idx), elin, clin)
+
                     else
 
-                        return error(MRSA, line:find('%[.+%]:') + 1, elin, clin)
+                        for i, n in pairs(sarg) do
+                            
+                            -- Assign local entities --
+                            if not souls[n] then
+                                
+                                local a_tp = ghst_ent(targ[i])
+
+                                -- Name arg --
+                                if a_tp == 'name' then
+                                
+                                    souls[n] = targ[i]:sub(2, -2)
+                                
+                                -- Date arg --
+                                elseif a_tp == 'date' then
+                                
+                                    souls[n] = targ[i]
+
+                                -- Unknow type --
+                                else
+                                
+                                    return ghst_err(GIVT, line:find(targ[i]), elin, clin)
+                                end
+
+                            else return ghst_err(ATRE, line:find(n), elin, clin) end
+                        end
                     end
 
                     call[c_cl] = clin
