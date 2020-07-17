@@ -1,6 +1,6 @@
 require 'leaf'
 
-local GHVER = '1.1.12'
+local GHVER = '1.1.13'
 
 local fpath
 local fname
@@ -432,7 +432,7 @@ function read(string)
 end
 
 function better_gsub(str, sup, sub)
-    
+
     local fx, lx = str:find(sup, 1, true)
 
     local lt = str:sub(1, fx - 1)
@@ -858,13 +858,13 @@ function ghst_opr(line, elin, clin)
                 if type(rval) == 'number' then
 
                     before = line
-                    line = better_gsub(line, '%(' .. slt .. sub .. srt .. '%)',
+                    line = better_gsub(line, '(' .. slt .. sub .. srt .. ')',
                     tostring(rval))
 
                 else
 
                     before = line
-                    line = better_gsub(line, '%(' .. slt .. sub .. srt .. '%)',
+                    line = better_gsub(line, '(' .. slt .. sub .. srt .. ')',
                     '\'' .. rval .. '\'')
                 end
 
