@@ -1,6 +1,6 @@
 require 'leaf'
 
-local GHVER = '1.1.10'
+local GHVER = '1.1.11'
 
 local fpath
 local fname
@@ -425,6 +425,22 @@ local o_nm = {
     [13] = 'or' ,
 }
 
+function read(string)
+    
+    io.write(string)
+    return io.read()
+end
+
+function better_gsub(str, sup, sub)
+    
+    local fx, lx = str:find(sup, 1, true)
+
+    local lt = str:sub(1, fx - 1)
+    local rt = str:sub(lx + 1)
+
+    return lt .. sub .. rt
+end
+
 function read_grave(name)
     
     return leaf.table_copy((graveyard[name] or {none = true}))
@@ -436,12 +452,6 @@ function bury_grave(name, body)
         
         graveyard[name] = (body or {})
     end
-end
-
-function read(string)
-    
-    io.write(string)
-    return io.read()
 end
 
 function ghst_err(error, word, line, clin)
@@ -605,7 +615,7 @@ function load_file(name, subf)
             -- Replace --
             for sub, new in pairs(pair) do
 
-                line = line:gsub(sub, new)
+                line = better_gsub(line, sub, new)
             end
 
             if indx then
@@ -725,6 +735,15 @@ function ghst_str(str)
     return str:sub(2, -2)
 end
 
+-- Is not inside an string --
+function ghst_iis(line, sub)
+    
+    if line:find('\'[^ ]*%?' .. sub .. '[^ ]*\'') then
+        
+        return true
+    end
+end
+
 function ghst_opr(line, elin, clin)
     
     -- Operation inside parentheses --
@@ -742,7 +761,7 @@ function ghst_opr(line, elin, clin)
             local val = line:match('%([-+]?%d+%.?%d*e?[-+]?%d*%)')
             local rpl = line:match('%(([-+]?%d+%.?%d*e?[-+]?%d*)%)')
 
-            line = line:gsub(val, rpl)
+            line = better_gsub(line, val, rpl)
         end
 
         while line:match('%(' .. pat .. '%)') do
@@ -756,33 +775,33 @@ function ghst_opr(line, elin, clin)
                 lft, rgt = line:match('%(([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)%)')
 
             -- Two names -- 
-            elseif line:match('%((\'[%w%p]*\')' .. sub .. '(\'[%w%p]*\')%)') then
+            elseif line:match('%((\'[^ ]*\')' .. sub .. '(\'[^ ]*\')%)') then
 
-                lft, rgt = line:match('%((\'[%w%p]*\')' .. sub .. '(\'[%w%p]*\')%)')
+                lft, rgt = line:match('%((\'[^ ]*\')' .. sub .. '(\'[^ ]*\')%)')
 
             -- name ~ date --
-            elseif line:match('%((\'[%w%p]*\')' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)%)') then
+            elseif line:match('%((\'[^ ]*\')' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)%)') then
 
-                lft, rgt = line:match('%((\'[%w%p]*\')' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)%)')
+                lft, rgt = line:match('%((\'[^ ]*\')' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)%)')
 
             -- date ~ name --
-            elseif line:match('%(([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '(\'[%w%p]*\')%)') then
+            elseif line:match('%(([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '(\'[^ ]*\')%)') then
 
-                lft, rgt = line:match('%(([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '(\'[%w%p]*\')%)')
+                lft, rgt = line:match('%(([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '(\'[^ ]*\')%)')
 
             else
 
                 -- Get the null match --
                 local lt, rt
                 lt = line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub)
-                or line:match('(\'[%w%p]*\')' .. sub)
-                or line:match('(\'[%w%p]*\')' .. sub)
+                or line:match('(\'[^ ]*\')' .. sub)
+                or line:match('(\'[^ ]*\')' .. sub)
                 or line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub)
 
                 rt = line:match(sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)')
-                or line:match(sub .. '(\'[%w%p]*\')')
+                or line:match(sub .. '(\'[^ ]*\')')
                 or line:match(sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)')
-                or line:match(sub .. '(\'[%w%p]*\')')
+                or line:match(sub .. '(\'[^ ]*\')')
 
                 local efnd
                 if not rt then
@@ -839,13 +858,13 @@ function ghst_opr(line, elin, clin)
                 if type(rval) == 'number' then
 
                     before = line
-                    line = line:gsub('%(' .. slt .. sub .. srt .. '%)',
+                    line = better_gsub(line, '%(' .. slt .. sub .. srt .. '%)',
                     tostring(rval))
 
                 else
 
                     before = line
-                    line = line:gsub('%(' .. slt .. sub .. srt .. '%)',
+                    line = better_gsub(line, '%(' .. slt .. sub .. srt .. '%)',
                     '\'' .. rval .. '\'')
                 end
 
@@ -865,14 +884,11 @@ function ghst_opr(line, elin, clin)
     -- Read graveyard values --
     while line:match('@([%w_]+)%.(%d+)') do
 
-        -- Error --
-        if type(line) == 'table' then return line.err end
-
         local pat = line:match('@[%w_]+%.%d+')
         local var, val = line:match('@([%w_]+)%.(%d+)')
 
         -- Check if value is not inside of a string --
-        if not line:find('\'[%w_]*@' .. var .. '%.' .. val .. '[%w_]*\'') then
+        if not ghst_iis(line, var .. '%.' .. val) then
 
             -- check if graveyard exists --
             if graveyard[var] then
@@ -890,7 +906,7 @@ function ghst_opr(line, elin, clin)
                 val = "'" .. val .. "'"
             end
 
-            line = line:gsub(pat, val)
+            line = better_gsub(line, pat, val)
         end
     end
 
@@ -914,44 +930,44 @@ function ghst_opr(line, elin, clin)
                 lft, rgt = line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)')
 
             -- Two names -- 
-            elseif line:match('(\'[%w%p]*\')' .. sub .. '(\'[%w%p]*\')') then
+            elseif line:match('(\'[^ ]*\')' .. sub .. '(\'[^ ]*\')') then
 
-                lft, rgt = line:match('(\'[%w%p]*\')' .. sub .. '(\'[%w%p]*\')')
+                lft, rgt = line:match('(\'[^ ]*\')' .. sub .. '(\'[^ ]*\')')
 
             -- name ~ date --
-            elseif line:match('(\'[%w%p]*\')' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)') then
+            elseif line:match('(\'[^ ]*\')' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)') then
 
-                lft, rgt = line:match('(\'[%w%p]*\')' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)')
+                lft, rgt = line:match('(\'[^ ]*\')' .. sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)')
 
             -- date ~ name --
-            elseif line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '(\'[%w%p]*\')') then
+            elseif line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '(\'[^ ]*\')') then
 
-                lft, rgt = line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '(\'[%w%p]*\')')
+                lft, rgt = line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub .. '(\'[^ ]*\')')
 
             else
 
                 -- Get the null match --
                 local lt, rt
                 lt = line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub)
-                or line:match('(\'[%w%p]*\')' .. sub)
-                or line:match('(\'[%w%p]*\')' .. sub)
+                or line:match('(\'[^ ]*\')' .. sub)
+                or line:match('(\'[^ ]*\')' .. sub)
                 or line:match('([-+]?%d+%.?%d*e?[-+]?%d*)' .. sub)
 
                 rt = line:match(sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)')
-                or line:match(sub .. '(\'[%w%p]*\')')
+                or line:match(sub .. '(\'[^ ]*\')')
                 or line:match(sub .. '([-+]?%d+%.?%d*e?[-+]?%d*)')
-                or line:match(sub .. '(\'[%w%p]*\')')
+                or line:match(sub .. '(\'[^ ]*\')')
 
                 local efnd
                 if not rt then
 
-                    efnd = elin:find(elin:match(sub .. '([%w%p]+)'))
+                    efnd = elin:find(elin:match(sub .. '([%w%p]+)'), 1, true)
                 
                 else
 
                     efnd = elin:find(elin:match('([%w%p]+)' .. sub), 1, true)
                 end
-                
+
                 return {err = ghst_err(APAU, efnd, elin, clin)}
             end
 
@@ -997,12 +1013,12 @@ function ghst_opr(line, elin, clin)
                 if type(rval) == 'number' then
 
                     before = line
-                    line = line:gsub(slt .. sub .. srt, tostring(rval))
+                    line = better_gsub(line, slt .. sub .. srt, tostring(rval))
 
                 else
 
                     before = line
-                    line = line:gsub(slt .. sub .. srt, '\'' .. rval .. '\'')
+                    line = better_gsub(line, slt .. sub .. srt, '\'' .. rval .. '\'')
                 end
 
                 -- Safe break --
@@ -1096,8 +1112,8 @@ function ghst_run(lines)
 
                 -- Replace value --
                 local rsub = line:match('#[%w_]+%[[-+%d%._]+%]')
-                or line:match('#[%w_]+%[\'[%w%p]*\'%]')
-                or line:match('#[%w_]+%[[%w%p_]+%]')
+                or line:match('#[%w_]+%[\'[^ ]*\'%]')
+                or line:match('#[%w_]+%[%?[%w_]+%]')
 
                 -- Use string sub instead of --
                 -- gsub to avoid missmatches -- 
@@ -1110,12 +1126,13 @@ function ghst_run(lines)
             end
 
             -- Read values --
-            while line:match('%?[%w_]+') do
+            local offset = 1
+            while line:sub(offset):match('%?[%w_]+') do
 
-                local var = line:match('%?([%w_]+)')
+                local var = line:sub(offset):match('%?([%w_]+)')
 
                 -- Check if value is not inside of a string --
-                if not line:find('\'[%w_]*%?' .. var .. '[%w_]*\'') then
+                if not ghst_iis(line, '?' .. var) then
 
                     local val = souls[var] or deads[var]
 
@@ -1127,14 +1144,14 @@ function ghst_run(lines)
                             val = "'" .. val .. "'"
                         end
 
-                        line = line:gsub('?' .. var, val)
+                        line = better_gsub(line, '?' .. var, val)
                     
                     else
 
                         return ghst_err(ATRU, line:find(var, 1, true), elin, clin)
                     end
 
-                else break end
+                else offset = offset + 1 end
             end
 
             -- Read graveyard length --
@@ -1144,12 +1161,12 @@ function ghst_run(lines)
                 local var, val = line:match('@([%w_]+)%.len')
 
                 -- Check if value is not inside of a string --
-                if not line:find('\'[%w%p]*@' .. var .. '%.len[%w%p]*\'') then
+                if not ghst_iis(line, '@' .. var .. '%.len') then
 
                     -- check if graveyard exists --
                     if graveyard[var] then
 
-                        line = line:gsub(pat, #graveyard[var])
+                        line = better_gsub(line, pat, tostring(#graveyard[var]))
 
                     else return ghst_err(ATRU, line:find(var, 1, true), elin, clin) end
                 end
@@ -1164,14 +1181,11 @@ function ghst_run(lines)
             -- Read graveyard values --
             while line:match('@[%w_]+%.%d+') do
 
-                -- Error --
-                if type(line) == 'table' then return line.err end
-
                 local pat = line:match('@[%w_]+%.%d+')
                 local var, val = line:match('@([%w_]+)%.(%d+)')
 
                 -- Check if value is not inside of a string --
-                if not line:find('\'[%w%p]*@' .. var .. '%.' .. val .. '[%w%p]*\'') then
+                if not ghst_iis(line, var .. '%.' .. val)  then
 
                     -- check if graveyard exists --
                     if graveyard[var] then
@@ -1189,14 +1203,14 @@ function ghst_run(lines)
                         val = "'" .. val .. "'"
                     end
 
-                    line = line:gsub(pat, val)
+                    line = better_gsub(line, pat, val)
                 end
             end
 
             -- Input --
             while line:match('read%[(.+)%]') do
 
-                local arg = line:match('read%[(\'[%w%p]*\')%]')
+                local arg = line:match('read%[(\'[^ ]*\')%]')
                 or line:match('read%[([-+]?%d+%.?%d*e?[-+]?%d*)%]')
                 or line:match('read%[(_)%]') 
                 
@@ -1215,16 +1229,19 @@ function ghst_run(lines)
                 _in:gsub(' ', '\\s')
                 _in:gsub('\'', '\\\'')
 
-                line = line:gsub('read%['.. arg .. '%]', '\'' .. _in .. '\'')
+                if not ghst_iis(line, 'read%['.. arg .. '%]') then
+                
+                    line = better_gsub(line, 'read%['.. arg .. '%]', '\'' .. _in .. '\'')
+                end
             end
 
             -- Not operator --
             local before = line
             for _, opr in pairs({'^not', ' not'}) do
 
-                if line:match(opr .. ' \'(.+)\'') then
+                if line:match(opr .. ' \'[^ ]+\'') then
                     
-                    line = line:gsub(opr .. ' \'(.+)\'', ' 0')
+                    line = line:gsub(opr .. ' \'([^ ]+)\'', ' 0')
                 end
 
                 if line:find(opr .. ' \'\'') then
@@ -1304,9 +1321,9 @@ function ghst_run(lines)
                 c_sc = c_sc + 1
 
                 -- String to bool --
-                if line:match('when (\'[%w%p]*\')%s?:') then
+                if line:match('when (\'[^ ]*\')%s?:') then
 
-                    local val = line:match('%s?(\'[%w%p]*\')%s?')
+                    local val = line:match('%s?(\'[^ ]*\')%s?')
                     local key = val
 
                     if val == "''" then val = '0'
@@ -1353,13 +1370,13 @@ function ghst_run(lines)
         
             -- Call spell -- 
             if line:match('#[%w_]+%[[-+]?%d+%.%d*%]')
-            or line:match('#[%w_]+%[\'[%w%p]*\'%]')
+            or line:match('#[%w_]+%[\'[^ ]*\'%]')
             or line:match('#[%w_]+%[_%]') then
 
                 c_cl = c_cl + 1
 
                 local spll = line:match('#[%w_]+%[[-+%d%._]+%]')
-                or line:match('#[%w_]+%[\'[%w%p]*\'%]')
+                or line:match('#[%w_]+%[\'[^ ]*\'%]')
 
                 local name = elin:match('#([%w_]+)%[.+%]')
                 local slin = leaf.table_find(lines, 'spell ' .. name .. '%[.+%]:')
@@ -1713,7 +1730,7 @@ function ghst_run(lines)
             -- Output --
             if line:match('^tell%[.*%]') then
 
-                local out = line:match('tell%[(\'[%w%p]*\')%]')
+                local out = line:match('tell%[(\'[^ ]*\')%]')
                 or line:match('tell%[([-+]?%d+%.?%d*e?[-+]?%d*)%]')
                 
                 if not out then
