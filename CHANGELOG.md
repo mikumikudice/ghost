@@ -1,3 +1,7 @@
+## 1.1.13
+\* better_gsub() getting metachars instead of raw strings (ghst_opr)<br/>
+  - Fixed: parentheses operations not working
+
 ## 1.1.12
 \- Output bug (not replaing internal metachars)
 
