@@ -1,3 +1,7 @@
+## 1.1.11
+\* Better compiling (names behaviour and value replacement)<br/>
+\* Better error catching
+
 ## 1.1.10
 \* Some internal changes<br/>
 \* Better compiling<br/>
