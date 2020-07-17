@@ -1,21 +1,23 @@
-local PHNVER = '1.0.0'
+local PHNVER = '1.0.1'
 
 local is_animing = false
 local is_revivng = false
 local obj_mbrcnt = 0
 local currentobj
 
-local ATAO = "Attempt to animate an object within another object"
-local ATUU = "Attempt to unnerve an unknown object"
+local AAOW = "Attempt to animate an object within another object"
+local AUUO = "Attempt to unnerve an unknown object"
+local AUUC = "Attempt to unnerve an unknown class"
 
-local ATIO = "Attempt to initialize member outside the object's animation scope"
+local AIUC = "Attempt to initialize an unknown class"
+local AIOS = "Attempt to initialize member outside the object's animation scope"
 
 local ATRU = "Attempt to revive an unknown object"
 
 function runlib(line, elin, clin)
     
     -- New class --
-    if line:match('animate [%w_]+') then
+    if line:match('animate [%w_]+:') then
 
         if not is_animing then
         
@@ -26,7 +28,7 @@ function runlib(line, elin, clin)
 
             currentobj = obj
         
-        else return {err = ghst_err(ATAO, elin:find(obj), elin, clin)} end
+        else return {err = ghst_err(AAOW, elin:find(obj), elin, clin)} end
     end
 
     -- Members --
@@ -40,11 +42,11 @@ function runlib(line, elin, clin)
             -- Convert member to numbers --
             line = 'dead ' .. name .. ' as ' .. (obj_mbrcnt)
 
-        else return {err = ghst_err(ATIO, 1, elin, clin)} end
+        else return {err = ghst_err(AIOS, 1, elin, clin)} end
     end
 
     -- Clear operations --
-    if line:match('unnerve [%w_]+') then
+    if line:match('unnerve [%w_]+%.') then
         
         local obj = line:match('unnerve ([%w_]+)')
 
@@ -58,9 +60,20 @@ function runlib(line, elin, clin)
 
                 line = ''
 
-            else return {err = ghst_err(ATUU, elin:find(obj), elin, clin)} end
+            else return {err = ghst_err(AUUO, elin:find(obj), elin, clin)} end
         
-        else line = 'forget ' .. obj end
+        else return {err = ghst_err(AUUC, elin:find(obj), elin, clin)} end
+    end
+
+    if line:match('unnerve [%w_]+') then
+        
+        local obj = line:match('unnerve ([%w_]+)')
+
+        if not read_grave(obj).none then
+        
+            line = 'forget ' .. obj
+        
+        else return {err = ghst_err(AUUO, elin:find(obj), elin, clin)} end
     end
 
     -- Animate object --
@@ -73,7 +86,7 @@ function runlib(line, elin, clin)
         -- No class --
         if copy.none then
 
-            return {err = ghst_err(ATRU, elin:find(clss), elin, clin)}
+            return {err = ghst_err(AIUC, elin:find(clss), elin, clin)}
         
         else
             
@@ -88,7 +101,7 @@ function runlib(line, elin, clin)
     end
 
     -- Use object --
-    if line:match('revive [%w_]+') then
+    if line:match('revive [%w_]+:') then
 
         local obj  = line:match('revive ([%w_]+)')
         local copy = read_grave(obj)
@@ -99,7 +112,7 @@ function runlib(line, elin, clin)
             bury_grave('it', copy)
             line = ''
 
-        else line = '?' .. obj end
+        else return {err = ghst_err(ATRU, elin:find(obj), elin, clin)} end
     end
 
     return line
