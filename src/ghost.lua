@@ -1,6 +1,6 @@
 require 'leaf'
 
-local GHVER = '1.1.11'
+local GHVER = '1.1.12'
 
 local fpath
 local fname
@@ -726,11 +726,11 @@ function ghst_str(str)
 
     str = str:gsub('\\\'', '\'')
 
-    nstr = str:gsub('\\c', ',')
-    nstr = str:gsub('\\p', '(')
-    nstr = str:gsub('\\P', ')')
-    nstr = str:gsub('\\r', '[')
-    nstr = str:gsub('\\R', ']')
+    str = str:gsub('\\c', ',')
+    str = str:gsub('\\p', '(')
+    str = str:gsub('\\P', ')')
+    str = str:gsub('\\r', '[')
+    str = str:gsub('\\R', ']')
 
     return str:sub(2, -2)
 end
@@ -1185,7 +1185,7 @@ function ghst_run(lines)
                 local var, val = line:match('@([%w_]+)%.(%d+)')
 
                 -- Check if value is not inside of a string --
-                if not ghst_iis(line, var .. '%.' .. val)  then
+                if not ghst_iis(line, var .. '%.' .. val) then
 
                     -- check if graveyard exists --
                     if graveyard[var] then
