@@ -1,6 +1,7 @@
 ## 1.1.14 - 15
 \* Fixed bug in spells with multiple args<br/>
-\* Changed error message (SGSA -> SGEA : '\[...] spare' -> '\[...] extra')
+\* Changed error message (SGSA -> SGEA : '\[...] spare' -> '\[...] extra')<br/>
+\* Error catching for mathlib
 
 ## 1.1.13
 \* better_gsub() getting metachars instead of raw strings (ghst_opr)<br/>
