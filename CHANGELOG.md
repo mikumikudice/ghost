@@ -1,3 +1,10 @@
+## 1.1.16
+\* Better compiling (syntax error catcher)
+  - tell, read, when, sle, gte keywords typo finder
+  
+\- Duplicated entities bug (souls and deads with same name)
+  - dead creator fixed (see 1.1.5)
+
 ## 1.1.14 - 15
 \* Fixed bug in spells with multiple args<br/>
 \* Changed error message (SGSA -> SGEA : '\[...] spare' -> '\[...] extra')<br/>
