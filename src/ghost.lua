@@ -1,6 +1,6 @@
 require 'leaf'
 
-local GHVER = '1.1.16'
+local GHVER = '1.1.17'
 
 local fpath
 local fname
@@ -519,7 +519,7 @@ function load_file(name, subf)
     -- File path --
     if ismain then
 
-        fpath = fpath:gsub(fname, '')
+        fpath = better_gsub(fpath, fname, '')
     end
 
     -- Only show running message --
@@ -680,7 +680,7 @@ function load_file(name, subf)
             -- Assign syntax --
             if line:match('![%w_].*') then
                 
-                if not line:match('![%w_] as ') then
+                if not line:match('![%w_]+%(?.*%)? as ') then
                     
                     local idx = line:match('![%w_]+(.*)')
                     return ghst_err(INSX, elin:find(idx, 1, true), elin, l_num)
@@ -1360,18 +1360,28 @@ function ghst_run(lines)
                     return ghst_err(IOWA, line:find(word), elin, clin)
                 end
 
+                local sarg = arg
+
                 -- Empty arg --
                 if arg == '_' then arg = '' end
 
                 local _in = read(ghst_str(arg))
                 
-                -- Fix scape chars --
-                _in:gsub(' ', '\\s')
-                _in:gsub('\'', '\\\'')
 
-                if not ghst_iis(line, 'read%['.. arg .. '%]') then
+                _in = _in:gsub(' ', '\\s')
+
+                -- Replace pontuaction --
+                _in = _in:gsub(',', '\\c')
+
+                _in = _in:gsub('%(', '\\p')
+                _in = _in:gsub('%)', '\\P')
+
+                _in = _in:gsub('%[', '\\r')
+                _in = _in:gsub('%]', '\\R')
+
+                if not ghst_iis(line, 'read%['.. sarg .. '%]') then
                 
-                    line = better_gsub(line, 'read%['.. arg .. '%]', '\'' .. _in .. '\'')
+                    line = better_gsub(line, 'read['.. sarg .. ']', '\'' .. _in .. '\'')
                 end
             end
 

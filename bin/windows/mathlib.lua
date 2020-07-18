@@ -31,6 +31,8 @@ function runlib(line, elin, clin)
             
             local num = line:match(name .. '%[([^ ]+)%]')
 
+            if num:sub(-1) == ']' then num = num:sub(1, -2) end
+
             -- Invalid number --
             if not tonumber(num) then
             
@@ -54,6 +56,8 @@ function runlib(line, elin, clin)
     while line:match(rpat) do
         
         local min, max = line:match(rpat)
+
+        if max:sub(-1) == ']' then max = max:sub(1, -2) end
 
         -- Invalid numbers --
         if not tonumber(min) then
