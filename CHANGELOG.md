@@ -1,3 +1,8 @@
+## 1.1.17
+\- Ghost not finding files with special characters in name<br/>
+\- Mathlib bug<br/>
+\- Syntax error catcher bug (matching with correct graveyards)
+
 ## 1.1.16
 \* Better compiling (syntax error catcher)
   - tell, read, when, sle, gte keywords typo finder
