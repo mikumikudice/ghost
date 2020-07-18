@@ -1,5 +1,7 @@
 math.randomseed(os.time())
 
+local APAI = "Attempt to perform arithmetic with invalid type"
+
 -- Version conflict --
 if not unpack then unpack = table.unpack end
 
@@ -25,15 +27,15 @@ function runlib(line, elin, clin)
     -- Math functions --
     for name, func in pairs(mathf) do
 
-        while line:match(name .. '%[%s?([-+]?%d+)%s?%]') do
+        while line:match(name .. '%[%s?[^ ]+%s?%]') do
             
-            local num = line:match(name .. '%[([-+]?%d+)%]')
+            local num = line:match(name .. '%[([^ ]+)%]')
 
             -- Invalid number --
             if not tonumber(num) then
             
-                local _, idx = elin:find(num)
-                return {err = ghst_err(APAN, idx, elin, clin)}
+                local idx = elin:find(num)
+                return {err = ghst_err(APAI, idx, elin, clin)}
             
             else num = tonumber(num) end
 
@@ -48,7 +50,7 @@ function runlib(line, elin, clin)
     end
 
     -- Random generator --
-    local rpat = 'rand%[%s?([-+]?%d+%.?%d*),%s?([-+]?%d+%.?%d*)%s?%]'
+    local rpat = 'rand%[%s?([^ ]+),%s?([^ ]+)%s?%]'
     while line:match(rpat) do
         
         local min, max = line:match(rpat)
@@ -56,17 +58,15 @@ function runlib(line, elin, clin)
         -- Invalid numbers --
         if not tonumber(min) then
             
-            local _, idx = elin:find('rand[' .. min, 1, true)
-            return {err = ghst_err(APAN, idx + 5, elin, clin)}
+            local idx = elin:find('rand[' .. min, 1, true)
+            return {err = ghst_err(APAI, idx + 5, elin, clin)}
         
         else min = tonumber(min) end
 
         if not tonumber(max) then
             
-            local sub = elin:match('rand%[.+,%s?(' .. max .. ')%s?%]')
-            local _, idx = elin:find(sub)
-
-            return {err = ghst_err(APAN, idx, elin, clin)}
+            local idx = elin:find(max)
+            return {err = ghst_err(APAI, idx, elin, clin)}
         
         else max = tonumber(max) end
 
@@ -90,7 +90,7 @@ function runlib(line, elin, clin)
                 local sub = elin:match(name .. '%[(.*)%]')
                 local _, idx = elin:find(sub)
     
-                return {err = ghst_err(APAN, idx, elin, clin)}
+                return {err = ghst_err(APAI, idx, elin, clin)}
             
             else max = tonumber(max) end
 
