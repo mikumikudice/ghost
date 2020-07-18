@@ -163,7 +163,7 @@ Lines that are executed when something evaluates to true or false.
 5
 6  !num as ?num pls 1
 7
-8  when ?num sme 3 : rebember 3
+8  when ?num sle 3 : rebember 3
 
 >>> 0
 >>> 1
