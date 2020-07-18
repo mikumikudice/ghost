@@ -1,6 +1,6 @@
 require 'leaf'
 
-local GHVER = '1.1.15'
+local GHVER = '1.1.16'
 
 local fpath
 local fname
@@ -42,7 +42,10 @@ local ATCD = "Attempt to concatenate name with date"
 local ATRD = "Attempt to remove date from name"
 
 local CNEI = "Could not execute it"
+local IESN = "Invalid entity/spell name"
+local INSX = "Invalid code syntax"
 local USFH = "Unfinished string found here"
+local UKFH = "Unknown keyword found here"
 
 local EOFA = "Expected <eof> after this statement"
 local EOFB = "Expected <eof> before this statement"
@@ -621,6 +624,142 @@ function load_file(name, subf)
             if indx then
                 
                 line = line:sub(1, indx - 1)
+            end
+
+            -- Wrong sintax --
+            local _, opq = line:gsub('%[', '')
+            local _, clq = line:gsub('%]', '')
+
+            -- Unclosed square brackets --
+            if opq > clq then
+
+                return ghst_err(EOFA, line:find('[', 1, true), elin, l_num)
+            
+            elseif opq < clq then
+        
+                return ghst_err(EOFB, line:find(']', 1, true), elin, l_num)
+            end
+
+            -- Weird Spells --
+            if line:match('spell .*') then
+            
+                -- Invalid name --
+                if not line:match('spell [%w_]+.*') then
+                
+                    local idx = line:match('spell (.*)')
+                    return ghst_err(IESN, elin:find(idx, 1, true), elin, l_num)
+                
+                -- Invalid syntax --
+                elseif not line:match('spell [%w_]+%[[%w%p%s]+%]:') then
+                
+                    local idx = line:match('spell [%w_]+(.*)')
+                    return ghst_err(INSX, elin:find(idx, 1, true), elin, l_num)
+                end
+            end
+
+            -- Entity names --
+            for _, tp in pairs({'dead', 'soul', 'graveyard'}) do
+                
+                if line:match('^' .. tp .. ' .*') then
+                    
+                    -- Remove keyword --
+                    local this = line:gsub(tp .. ' ', '')
+                    
+                    if not this:match('^[%w_]+') then
+
+                        return ghst_err(IESN, elin:find(this, 1, true), elin, l_num)
+                    
+                    elseif not this:match('[%w_]+ as .*') then
+                
+                        local idx = this:match('[%w_]+(.*)')
+                        return ghst_err(INSX, elin:find(idx, 1, true), elin, l_num)
+                    end
+                end
+            end
+
+            -- Assign syntax --
+            if line:match('![%w_].*') then
+                
+                if not line:match('![%w_] as ') then
+                    
+                    local idx = line:match('![%w_]+(.*)')
+                    return ghst_err(INSX, elin:find(idx, 1, true), elin, l_num)
+                end
+            end
+
+            -- Common typos --
+            for _, kw in pairs({
+
+                '',
+                'when [^ ]+%s?:%s?',
+                'also%s?:%s?',
+                'else%s?:%s?'
+                
+            }) do
+                
+                if line:match(kw .. 'rebember [^ ]+') then
+                    
+                    local idx = line:find('rebember [^ ]+')
+                    return ghst_err(UKFH .. '.\nDo you mean "remember"?',
+                    idx, elin, l_num)
+                
+                else
+                
+                    -- Tell --
+                    for _, vr in pairs({
+
+                        'tekk',
+                        'rell',
+                        'rtkn',
+                        'tel',
+                    }) do
+
+                        if line:match(kw .. vr .. '%[[^ ]+%]') then
+                            
+                            local idx = line:find(vr .. '%[[^ ]+%]')
+                            return ghst_err(UKFH .. '.\nDo you mean "tell"?',
+                            idx, elin, l_num)
+                        end
+                    end
+
+                    -- Read --
+                    for _, vr in pairs({
+
+                        'teread',
+                        'rwew',
+                        'rhfd',
+                        'rea',
+                    }) do
+
+                        if line:match(kw .. vr .. '%[[^ ]+%]') then
+                            
+                            local idx = line:find(vr .. '%[[^ ]+%]')
+                            return ghst_err(UKFH .. '.\nDo you mean "read"?',
+                            idx, elin, l_num)
+                        end
+                    end
+                end
+            end
+
+            if line:match('if .*%s:%s') then
+                
+                local idx = line:find('if .*%s:%s')
+                return ghst_err(UKFH .. '.\nDo you mean "when"?',
+                idx, elin, l_num)
+            end
+
+            if line:match('[^ ]+ sme [^ ]+') then
+                
+                local idx = line:find(' sme ')
+                return ghst_err(UKFH .. '.\nDo you mean "sle"?',
+                idx + 1, elin, l_num)
+            end
+
+            if line:match('[^ ]+ gre [^ ]+') then
+                
+                local idx = line:find(' gre ')
+                return ghst_err(UKFH .. '.\nDo you mean "gte"?',
+                idx + 1, elin, l_num)
             end
 
             -- Store line --
@@ -1597,6 +1736,12 @@ function ghst_run(lines)
                 -- Dead was not assigned yet --
                 if not deads[var] then
                     
+                    -- Duplicated variable --
+                    if souls[var] then
+
+                        return ghst_err(ATRE, elin:find(var, 1, true) or 1, elin, clin)
+                    end
+
                     -- Valid type --
                     if ghst_ist(val) then
 
