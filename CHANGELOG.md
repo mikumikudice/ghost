@@ -15,7 +15,7 @@
   - Fixed: parentheses operations not working
 
 ## 1.1.12
-\- Output bug (not replaing internal metachars)
+\- Output bug (not replacing internal metachars)
 
 ## 1.1.11
 \* Better compiling (names behaviour and value replacement)<br/>
