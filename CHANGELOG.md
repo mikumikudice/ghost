@@ -1,3 +1,6 @@
+## 1.1.18
+\- Removed safe copy for graveyards (``read_grave()``)
+
 ## 1.1.17
 \- Ghost not finding files with special characters in name<br/>
 \- Mathlib bug<br/>
