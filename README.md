@@ -31,7 +31,7 @@ Ghost is an interpreter forged to kill programs. To kill them, it must make the 
     a simple program.
     
 ## Usage
-Program compiled using [[luastatic](https://github.com/ers35/luastatic)].
+Program compiled using [luastatic](https://github.com/ers35/luastatic).
 
 ``./ghost file.gh`` to run directly the code.<br/>
 ``./ghost`` to show a hello entry.
