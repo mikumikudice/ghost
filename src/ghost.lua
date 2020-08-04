@@ -1,6 +1,6 @@
 require 'leaf'
 
-local GHVER = '1.1.17'
+local GHVER = '1.1.18'
 
 local fpath
 local fname
@@ -446,7 +446,7 @@ end
 
 function read_grave(name)
     
-    return leaf.table_copy((graveyard[name] or {none = true}))
+    return graveyard[name] or {none = true}
 end
 
 function bury_grave(name, body)
