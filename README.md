@@ -150,7 +150,7 @@ Lines that are executed when something evaluates to true or false.
 
   * `when <val> : ;something` executed when `val` is true.
   * `else : ;something` executed when the logic line above is not executed.
-  * `also : ;something` executed after the logic line above was executed.
+  * `also : ;something` executed after the above line is executed.
 
 ## Jump line
 `remember <date>` jumps to line `date`. Useful for loops. e.g.
