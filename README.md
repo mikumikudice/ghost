@@ -148,9 +148,9 @@ Anything that is greater (or diferent) than 0 is true. Empty names (`''`) and `0
 ## IF-ELSE
 Lines that are executed when something evaluates to true or false.
 
-  * `when <val> : ;something` executed when `val`is true.
+  * `when <val> : ;something` executed when `val` is true.
   * `else : ;something` executed when the logic line above is not executed.
-  * `also : ;something` executet then the logic line is executed.
+  * `also : ;something` executed after the logic line above was executed.
 
 ## Jump line
 `remember <date>` jumps to line `date`. Useful for loops. e.g.
