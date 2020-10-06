@@ -1,17 +1,17 @@
 ## 1.1.18
-\- Removed safe copy for graveyards (``read_grave()``)
+\- Internal safe copy function for graveyards (``read_grave()``)
 
 ## 1.1.17
-\- Ghost not finding files with special characters in name<br/>
+\- (BUG) Ghost interpreter not finding files with special characters in name<br/>
 \- Mathlib bug<br/>
 \- Syntax error catcher bug (matching with correct graveyards)
 
-## 1.1.16
+## 1.1.16  
+\- Duplicated entities bug (souls and deads could have the same name)
+    - dead creator fixed (see 1.1.5)
+
 \* Better compiling (syntax error catcher)
-  - tell, read, when, sle, gte keywords typo finder
-  
-\- Duplicated entities bug (souls and deads with same name)
-  - dead creator fixed (see 1.1.5)
+    - tell, read, when, sle, gte keywords typo finder
 
 ## 1.1.14 - 15
 \* Fixed bug in spells with multiple args<br/>
@@ -20,7 +20,7 @@
 
 ## 1.1.13
 \* better_gsub() getting metachars instead of raw strings (ghst_opr)<br/>
-  - Fixed: parentheses operations not working
+    - Fixed: parentheses operations not working
 
 ## 1.1.12
 \- Output bug (not replacing internal metachars)
@@ -30,19 +30,19 @@
 \* Better error catching
 
 ## 1.1.10
-\* Some internal changes<br/>
-\* Better compiling<br/>
 \- Bug in ghst_opr (function returning wrong error format)<br/>
 \- Spell internal return bug<br/>
 \- Other compiling bugs<br/>
+\* Some internal changes<br/>
+\* Better compiling<br/>
 \+ OOP Suport (for Phantom lib)
 
 ## 1.1.9
 \+ Forget function now can erease graveyards
 
 ## 1.1.8
-\+ Support for numbers in scientific notation<br/>
-\* Missing error catcher in 1st ghst_opr()
+\* Missing error catcher in 1st ghst_opr()<br/>
+\+ Support for numbers in scientific notation
 
 ## 1.1.7
 \* Better compiling (fixed (possible) string missmatch/added new internal escape chars)<br/>
@@ -54,10 +54,10 @@
 \+ Error catcher for invoked libs
 
 ## 1.1.5
-\* Multi sspell callers (e.g. awake #\[one\[#two\[\_]])<br/>
-\+ Forget function<br/>
 \- Duplicated entities bug (souls and deads with same name)<br/>
 \- Math lib bug (attempt to call a nil value (global 'unpack'))<br/>
+\* Multi sspell callers (e.g. awake #\[one\[#two\[\_]])<br/>
+\+ Forget function
 
 ## 1.1.4
 \- 1.1.3 when block bug ('\[-+]%d+%.%d*' -> '\[-+]%d+%.?%d*')<br/>
