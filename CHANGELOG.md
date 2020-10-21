@@ -70,7 +70,7 @@
 
 ## 1.1.2
 \- lines working inside false when block<br/>
-\- grt, sml, gre, sle bug<br/>
+\- grt, sml, gte, sle bug<br/>
 \- Spell args bug<br/>
 \* Fixed quote escape char (`\q` -> `\'`)<br/>
 \* File extention (`.g` -> `.gh`)<br/>
