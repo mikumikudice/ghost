@@ -7,10 +7,10 @@
 \- Syntax error catcher bug (matching with correct graveyards)
 
 ## 1.1.16  
-\- Duplicated entities bug (souls and deads could have the same name)
+\- Duplicated entities bug (souls and deads could have the same name)<br/>
     - dead creator fixed (see 1.1.5)
 
-\* Better compiling (syntax error catcher)
+\* Better compiling (syntax error catcher)<br/>
     - tell, read, when, sle, gte keywords typo finder
 
 ## 1.1.14 - 15
@@ -46,7 +46,7 @@
 
 ## 1.1.7
 \* Better compiling (fixed (possible) string missmatch/added new internal escape chars)<br/>
-\* Path loading to external files
+\* Path loading to external files<br/>
 \* Other code changes
 
 ## 1.1.6
