@@ -78,7 +78,7 @@ end
 ```
 
 ### I/O
-Read and write values from or to user.
+Read and write values from or to the user.
 
   `read[<name or _>]` returns the typed value by the user.<br/>
   `tell[<name or date>]` prints something to the user.
