@@ -446,7 +446,18 @@ end
 
 function read_grave(name)
     
-    return graveyard[name] or {none = true}
+    if graveyard[name] then
+
+        local copy = {}
+
+        for key, val in pairs(graveyard[name]) do
+
+            copy[key] = val
+        end
+
+        return copy
+
+    else return {none = true} end
 end
 
 function bury_grave(name, body)
