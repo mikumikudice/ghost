@@ -1,3 +1,12 @@
+##1.2.0
+\+ Names idexing like graveyards<br/>
+\* Fixed some bugs of pattern matching<br/>
+\* Fixed read_grave (returning table itself instead of copy)<br/>
+    
+  * This change undoes the 1.1.18 commit<br/>
+
+\- Empty lines with tabs
+
 ## 1.1.18
 \- Internal safe copy function for graveyards (``read_grave()``)
 
