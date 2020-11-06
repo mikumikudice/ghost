@@ -190,8 +190,17 @@ tell[@fruits.@fruits.len]
 >>> pineapple
 ```
 
-\* These methods can be used with strings, but instead of a dot it uses two dots
+\* These methods can be used with strings, but instead of a dot it uses two dots.
+```assembly
+'hello':4
 
+>>> l
+
+dead str as 'heya'
+str:len
+
+>>> 4
+```
 ### Corpses
 An corpse is an external `.gh` file that is loaded inside the main file. (acts like the `dofile` in Lua).
 
