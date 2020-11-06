@@ -1,7 +1,0 @@
-+ Names idexing like graveyards
-* Fixed some bugs of pattern matching
-* Fixed read_grave (returning table itself instead of copy)
-    
-    * This change undoes the commit in 1.1.18
-
-- Empty lines with tabs
