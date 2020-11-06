@@ -1,4 +1,4 @@
-##1.2.0
+## 1.2.0
 \+ Names idexing like graveyards<br/>
 \* Fixed some bugs of pattern matching<br/>
 \* Fixed read_grave (returning table itself instead of copy)<br/>
