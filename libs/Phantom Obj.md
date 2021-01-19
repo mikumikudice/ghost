@@ -1,7 +1,7 @@
 # Phantom Obj - OOP for ghost
 Phantom object is an library that internally creates graveyard blueprints and clone them for an "pseudo class child".
 
-## Creating an class (blueprint)
+## Creating a class (blueprint)
 ```assembly
 animate <class-name>:
 
@@ -21,7 +21,7 @@ dead <atribute-name> as ?count
 forget count
 ```
 
-## Instantiating a object
+## Instantiating an object
 ```assembly
 spawn <class>: <obj-name>
 ```
