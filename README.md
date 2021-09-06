@@ -190,7 +190,7 @@ tell[@fruits.@fruits.len]
 >>> pineapple
 ```
 
-\* These methods can be used with strings, but instead of a dot it uses two dots.
+\* These methods can be used with strings, but instead of using a dot you should use colons.
 ```assembly
 'hello':4
 
